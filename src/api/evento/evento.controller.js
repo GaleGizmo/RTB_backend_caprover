@@ -1,5 +1,16 @@
 const Evento = require("./evento.model");
 
+//recoge todos los eventos de la BBDD
+const getAllEventos=async (req,res, next)=>{
+    try {
+        const eventos= await Evento.find()
+    
+        return res.json(eventos)
+        
+    } catch (error) {
+        return next(error)
+    }
+    }
 //añade un evento a la BBDD
 const setEvento = async (req, res, next) => {
   try {
@@ -112,4 +123,4 @@ const updateEvento = async (req, res, next) => {
   }
 };
 
-module.exports = { setEvento, updateEvento, deleteEvento };
+module.exports = {getAllEventos, setEvento, updateEvento, deleteEvento };

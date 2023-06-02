@@ -6,7 +6,7 @@ const commentSchema = mongoose.Schema(
         event:{type:mongoose.Types.ObjectId, ref:"evento"},
         title:{type:String, required:true, unique:false},
         content:{type:String, required:false, unique:false},
-        value:{type:String, required:false, unique:false}
+        value:{type:Number, required:false, unique:false}
     },
     {
         timestamps: true,
