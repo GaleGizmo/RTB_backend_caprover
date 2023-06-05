@@ -37,7 +37,7 @@ const setEvento = async (req, res, next) => {
       !date_start ||
       !date_end
     ) {
-      return res.status(400).json({ message: "Missing required fields" });
+      return res.status(400).json({ message: "Faltan campos obligatorios" });
     }
 
     const timestamp = new Date();
