@@ -16,6 +16,7 @@ const EventoSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    collection: "evento"
   }
 );
 
