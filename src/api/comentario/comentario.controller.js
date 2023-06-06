@@ -59,25 +59,22 @@ const createComentario = async (req, res, next) => {
 const editComentario = async (req, res, next) => {
   try {
     const { idComentario } = req.params;
-    const userId = req.user._id;
+    
     const { title, content, value } = req.body;
 
-    const comentario = await Comentario.findById(idComentario);
+    const comentarioToUpdate = await Comentario.findById(idComentario);
 
-    if (!comentario) {
+    if (!comentarioToUpdate) {
       return res.status(404).json({ message: "Comentario no encontrado" });
     }
 
-    if (comentario.user.toString() !== userId.toString()) {
-      return res.status(403).json({ message: "No tienes permiso para editar este comentario" });
-    }
+   
+    if (title) comentarioToUpdate.title = title;
+    if (content) comentarioToUpdate.content = content;
+    if (value) comentarioToUpdate.value = value;
 
-    comentario.title = title;
-    comentario.content = content;
-    comentario.value = value;
-
-    const comentarioActualizado = await comentario.save();
-    return res.status(200).json(comentarioActualizado);
+    const updatedComentario = await comentarioToUpdate.save();
+    return res.status(200).json(updatedComentario);
   } catch (error) {
     return next(error);
   }

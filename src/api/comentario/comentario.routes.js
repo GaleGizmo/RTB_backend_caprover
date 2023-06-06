@@ -5,10 +5,10 @@ const comentarioRoutes = express.Router();
 const { getAllComentarios, getComentariosByUser, getComentariosByEvent, createComentario, deleteComentario, editComentario } = require('./comentario.controller.js');
 
 comentarioRoutes.get('/', getAllComentarios);
-comentarioRoutes.get('getbyuser/:userId', [isAuth], getComentariosByUser);
+comentarioRoutes.get('/getbyuser/:userId', [isAuth], getComentariosByUser);
 comentarioRoutes.get('/getbyevent/:eventId', [isAuth], getComentariosByEvent);
-comentarioRoutes.put('/update/:idcomentario', [isAuth], editComentario);
+comentarioRoutes.put('/:idComentario', [isAuth], editComentario);
 comentarioRoutes.post('/', [isAuth], createComentario);
-comentarioRoutes.delete('/delete/:idcomentario', [isAuth],deleteComentario);
+comentarioRoutes.delete('/:idComentario', [isAuth],deleteComentario);
 
 module.exports = comentarioRoutes;

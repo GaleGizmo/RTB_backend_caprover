@@ -1,11 +1,11 @@
 const express = require('express');
-const { isAdmin } = require("../../middleware/auth.js")
+const { isAdmin, isAdminOrOwner } = require("../../middleware/auth.js")
 const usuarioRoutes=express.Router();   
 
-const { createUsuario, deleteUsuario, login } = require('./usuario.controller.js');
+const { createUsuario, deleteUsuario, login, editUsuario } = require('./usuario.controller.js');
 
 usuarioRoutes.post('/register', createUsuario);
 usuarioRoutes.post('/login', login);
-
-usuarioRoutes.delete('delete/:id',[isAdmin],deleteUsuario);
+usuarioRoutes.put('/:idUsuario',[isAdminOrOwner],editUsuario);
+usuarioRoutes.delete('/:idUsuario',[isAdmin],deleteUsuario);
 module.exports=usuarioRoutes;
