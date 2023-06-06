@@ -91,19 +91,14 @@ const editUsuario = async (req, res, next) => {
 
    
     // Actualiza los datos del usuario si es procedente
-    const existingEmailUser = await Usuario.findOne({ email });
-    if (existingEmailUser) {
-      return res.status(400).json({ message: "Ese email ya está en uso" });
-    }
+   
     if (email) userToUpdate.email = email;
     if (password) {
       const hashedPassword = await bcrypt.hash(password, 10);
       userToUpdate.password = hashedPassword;
     }
-    const existingUsername = await Usuario.findOne({ username });
-    if (existingUsername) {
-      return res.status(400).json({ message: "Ese nombre de usuario no está disponible" });
-    }
+    
+   
     if (username) userToUpdate.username = username;
     if (birthday) userToUpdate.birthday = birthday;
     if (avatar) userToUpdate.avatar = avatar;

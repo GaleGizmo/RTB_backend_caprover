@@ -89,6 +89,11 @@ const updateEvento = async (req, res, next) => {
   try {
     const { idEvento } = req.params;
 
+    let eventoToUpdate = await Evento.findById(idEvento);
+    if (!eventoToUpdate) {
+      return res.status(404).json({ message: "Evento no encontrado" });
+    }
+
     const requiredFields = [
       "title",
       "subtitle",
@@ -106,7 +111,7 @@ const updateEvento = async (req, res, next) => {
       });
     }
 
-    const eventoToUpdate = new Evento(req.body);
+    eventoToUpdate = new Evento(req.body);
     if (req.file) {
       eventoToUpdate.body.image = req.file.path;
     }
