@@ -1,41 +1,39 @@
 require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const server = express();
 
-server.use(express.urlencoded({ extended: true }));
-server.use(express.json());
+const cors = require("cors");
+
 const cloudinary = require("cloudinary").v2;
+
+const PORT = process.env.PORT;
+
+const db = require("./src/utils/db.js");
+
+db.connectDB();
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
-const PORT = process.env.PORT || 3000;
+
+const express = require("express");
+const eventoRoutes = require("./src/api/evento/evento.routes");
+const usuarioRoutes = require("./src/api/usuario/usuario.routes");
+const comentarioRoutes = require("./src/api/comentario/comentario.routes");
+
+const server = express();
 
 server.use(cors());
 
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
-server.use(express.static("public"));
-
-
-const db = require("./src/utils/db.js");
-db.connectDB();
-
-
-const eventoRoutes = require("./src/api/evento/evento.routes");
-const usuarioRoutes = require("./src/api/usuario/usuario.routes");
-const comentarioRoutes = require("./src/api/comentario/comentario.routes");
 
 server.use("/usuario", usuarioRoutes);
 server.use("/evento", eventoRoutes);
 server.use("/comentario", comentarioRoutes);
 
-
-/*
 server.use((err, req, res, next) => {
-  return res.status(err.status || 500).json(err.message || "Error inesperado");
+  return res.status(err.status ||  500).json(err.message || "Unexpected error");
 });
 
 server.use("*", (req, res, next) => {
@@ -43,10 +41,9 @@ server.use("*", (req, res, next) => {
 });
 
 server.use("/", (req, res) => {
-  res.send("its alive!");
-});*/
+  res.send("Working");
+});
 
 server.listen(PORT, () => {
-  console.log("El server pita en http://localhost:" + PORT);
+  console.log("The server is working http://localhost/:" + PORT);
 });
-module.exports = server;
