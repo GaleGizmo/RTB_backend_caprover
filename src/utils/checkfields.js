@@ -1,5 +1,5 @@
 
-function checkMandatoryFields(req, res, next) {
+function checkEventMandatoryFields(body) {
 const requiredFields = [
     "title",
     "subtitle",
@@ -9,13 +9,13 @@ const requiredFields = [
     "price",
     "date_start",
   ];
-  const missingFields = requiredFields.filter((field) => !req.body[field]);
+  const missingFields = requiredFields.filter((field) => !body[field]);
 
-  if (missingFields.length > 0) {
-    return res.status(400).json({
-      error: `Faltan campos obligatorios: ${missingFields.join(", ")}`,
-    });
-  }
+  // if (missingFields.length > 0) {
+  //   return false;
+  
+  // } else return true
+  return missingFields.length === 0 
 }
 
-module.exports = {checkMandatoryFields}
+module.exports = {checkEventMandatoryFields}

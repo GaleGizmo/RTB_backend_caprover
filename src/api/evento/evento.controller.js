@@ -1,4 +1,5 @@
-const { checkMandatoryFields } = require("../../utils/checkfields");
+const { checkMandatoryFields } = require("../../middleware/checkfields");
+const { checkEventMandatoryFields } = require("../../utils/checkfields");
 const Evento = require("./evento.model");
 
 //recoge todos los eventos de la BBDD
@@ -29,7 +30,7 @@ const setEvento = async (req, res, next) => {
       genre,
     } = req.body;
 
-    checkMandatoryFields(req, res)
+   
 
     
 
@@ -78,6 +79,11 @@ const deleteEvento = async (req, res, next) => {
 //actualiza un evento de la BBDD
 const updateEvento = async (req, res, next) => {
   try {
+    
+    //Comprobamos que los campos obligatorios estén rellenos mediante funcion en utils
+    // if (!checkEventMandatoryFields(req.body)){
+    //   return res.status(400).json({ message: "Campos obligatorios faltantes" });}
+
     const { idEvento } = req.params;
 
     let eventoToUpdate = await Evento.findById(idEvento);
@@ -85,7 +91,8 @@ const updateEvento = async (req, res, next) => {
       return res.status(404).json({ message: "Evento no encontrado" });
     }
 
-   checkMandatoryFields(req, res)
+   
+   
 
     eventoToUpdate = new Evento(req.body);
     if (req.file) {
