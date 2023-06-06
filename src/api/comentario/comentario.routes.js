@@ -1,5 +1,5 @@
 const express = require('express');
-const { isAdmin } = require("../../middleware/auth.js")
+const { isAdmin, isAdminOrOwner } = require("../../middleware/auth.js")
 const {isAuth} = require("../../middleware/auth.js")
 const comentarioRoutes = express.Router();
 const { getAllComentarios, getComentariosByUser, getComentariosByEvent, createComentario, deleteComentario, editComentario } = require('./comentario.controller.js');
@@ -7,8 +7,8 @@ const { getAllComentarios, getComentariosByUser, getComentariosByEvent, createCo
 comentarioRoutes.get('/', getAllComentarios);
 comentarioRoutes.get('/getbyuser/:userId', [isAuth], getComentariosByUser);
 comentarioRoutes.get('/getbyevent/:eventId', [isAuth], getComentariosByEvent);
-comentarioRoutes.put('/:idComentario', [isAuth], editComentario);
+comentarioRoutes.put('/:idComentario', [isAdminOrOwner], editComentario);
 comentarioRoutes.post('/', [isAuth], createComentario);
-comentarioRoutes.delete('/:idComentario', [isAuth],deleteComentario);
+comentarioRoutes.delete('/:idComentario', [isAdminOrOwner],deleteComentario);
 
 module.exports = comentarioRoutes;
