@@ -3,16 +3,27 @@ const { checkEventMandatoryFields } = require("../../utils/checkfields");
 const Evento = require("./evento.model");
 
 //recoge todos los eventos de la BBDD
-const getAllEventos=async (req,res, next)=>{
-    try {
-        const eventos= await Evento.find()
-    
-        return res.json(eventos)
-        
-    } catch (error) {
-        return next(error)
-    }
-    }
+const getAllEventos = async (req, res, next) => {
+  try {
+    const eventos = await Evento.find()
+
+    return res.json(eventos)
+
+  } catch (error) {
+    return next(error)
+  }
+};
+
+//Recogemos un evento por id
+const getEventoById = async (req, res, next) => {
+  try {
+    const { idEvento } = req.params;
+    const evento = await Evento.findById(idEvento);
+    return res.status(200).json(evento);
+  } catch (error) {
+    return next(error);
+  }
+};
 //añade un evento a la BBDD
 const setEvento = async (req, res, next) => {
   try {
@@ -32,7 +43,7 @@ const setEvento = async (req, res, next) => {
 
    
 
-    
+
 
     const timestamp = new Date();
     const newEvento = new Evento({
@@ -47,14 +58,14 @@ const setEvento = async (req, res, next) => {
       url,
       image,
       genre,
-    timestamp 
+      timestamp
     });
 
     await newEvento.save().then(() => {
       return res.status(200).json("evento creado con éxito");
     });
   } catch (error) {
-  
+
     return next(error);
   }
 };
@@ -67,8 +78,8 @@ const deleteEvento = async (req, res, next) => {
     const deletedEvento = await Evento.findByIdAndDelete(idEvento);
 
     if (!deletedEvento) {
-        return res.status(404).json({ message: "Evento no encontrado" });
-      }
+      return res.status(404).json({ message: "Evento no encontrado" });
+    }
 
     return res.status(200).json(deletedEvento);
   } catch (error) {
@@ -112,4 +123,4 @@ const updateEvento = async (req, res, next) => {
   }
 };
 
-module.exports = {getAllEventos, setEvento, updateEvento, deleteEvento };
+module.exports = { getAllEventos, getEventoById, setEvento, updateEvento, deleteEvento };

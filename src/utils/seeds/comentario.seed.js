@@ -5,7 +5,7 @@ const DB_URL = process.env.DB_URL;
 
 const misComentarios = [
     {
-        user:"647e129a8ad57f9c059d621b",
+        user:"647e3814219fb0e5e7fca1d7",
         event:"647e16d4a4e03f94f62caaa4",
         title:"¡¡¡Viva San Fermin!!!",
         content:"Las mejores fiestas de toda España, Aupa San Fermin :)",
