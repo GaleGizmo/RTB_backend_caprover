@@ -94,7 +94,7 @@ const isAdminOrComentarioOwner = async (req, res, next) => {
      
   
       // Comprueba si el usuario logueado es un admin o el propietario
-      if (userLogued.role === 2 || comentario.user===userLogued.id) {
+      if (userLogued.role === 2 || comentario.user.toString()===userLogued.id.toString()) {
           userLogued.password = null;
           req.user = userLogued;
           next();
