@@ -11,7 +11,7 @@ cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 server.use(cors());
 
