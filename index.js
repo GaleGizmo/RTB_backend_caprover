@@ -18,6 +18,12 @@ server.use(cors());
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 server.use(express.static("public"));
+
+
+const db = require("./src/utils/db.js");
+db.connectDB();
+
+
 const eventoRoutes = require("./src/api/evento/evento.routes");
 const usuarioRoutes = require("./src/api/usuario/usuario.routes");
 const comentarioRoutes = require("./src/api/comentario/comentario.routes");
@@ -26,9 +32,8 @@ server.use("/usuario", usuarioRoutes);
 server.use("/evento", eventoRoutes);
 server.use("/comentario", comentarioRoutes);
 
-const db = require("./src/utils/db.js");
-db.connectDB();
 
+/*
 server.use((err, req, res, next) => {
   return res.status(err.status || 500).json(err.message || "Error inesperado");
 });
@@ -39,7 +44,7 @@ server.use("*", (req, res, next) => {
 
 server.use("/", (req, res) => {
   res.send("its alive!");
-});
+});*/
 
 server.listen(PORT, () => {
   console.log("El server pita en http://localhost:" + PORT);
