@@ -17,7 +17,7 @@ server.use(cors());
 
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
-
+server.use(express.static("public"));
 const eventoRoutes = require("./src/api/evento/evento.routes");
 const usuarioRoutes = require("./src/api/usuario/usuario.routes");
 const comentarioRoutes = require("./src/api/comentario/comentario.routes");
@@ -44,3 +44,4 @@ server.use("/", (req, res) => {
 server.listen(PORT, () => {
   console.log("El server pita en http://localhost:" + PORT);
 });
+module.exports = server;
