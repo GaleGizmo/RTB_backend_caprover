@@ -1,3 +1,4 @@
+const { checkMandatoryFields } = require("../../utils/checkfields");
 const Evento = require("./evento.model");
 
 //recoge todos los eventos de la BBDD
@@ -28,17 +29,9 @@ const setEvento = async (req, res, next) => {
       genre,
     } = req.body;
 
-    if (
-      !title ||
-      !content ||
-      !user_creator ||
-      !site ||
-      !price ||
-      !date_start 
-      
-    ) {
-      return res.status(400).json({ message: "Faltan campos obligatorios" });
-    }
+    checkMandatoryFields(req, res)
+
+    
 
     const timestamp = new Date();
     const newEvento = new Evento({
@@ -60,9 +53,7 @@ const setEvento = async (req, res, next) => {
       return res.status(200).json("evento creado con éxito");
     });
   } catch (error) {
-    if (error.name === "ValidationError") {
-      return res.status(400).json({ message: error.message });
-    }
+  
     return next(error);
   }
 };
@@ -94,22 +85,7 @@ const updateEvento = async (req, res, next) => {
       return res.status(404).json({ message: "Evento no encontrado" });
     }
 
-    const requiredFields = [
-      "title",
-      "subtitle",
-      "content",
-      "user_creator",
-      "site",
-      "price",
-      "date_start",
-    ];
-    const missingFields = requiredFields.filter((field) => !req.body[field]);
-
-    if (missingFields.length > 0) {
-      return res.status(400).json({
-        error: `Faltan campos obligatorios: ${missingFields.join(", ")}`,
-      });
-    }
+   checkMandatoryFields(req, res)
 
     eventoToUpdate = new Evento(req.body);
     if (req.file) {
