@@ -1,11 +1,13 @@
 {
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "iniciar": "node index.js",
     "dev": "nodemon index.js",
     "UserSeed": "node ./src/utils/seeds/usuario.seed.js",
     "EventoSeed": "node ./src/utils/seeds/evento.seed.js",
     "ComentarioSeed": "node ./src/utils/seeds/comentario.seed.js"
+
     
   },
   "dependencies": {
