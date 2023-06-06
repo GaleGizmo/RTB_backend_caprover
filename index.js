@@ -1,49 +1,21 @@
-require("dotenv").config();
+const express = require('express')
+const server = express()
+const cors = require('cors')
 
-const cors = require("cors");
+server.use(cors())
 
-const cloudinary = require("cloudinary").v2;
+const router = express.Router()
 
-const PORT = process.env.PORT;
 
-const db = require("./src/utils/db.js");
+server.use(express.static("public"))
 
-db.connectDB();
+// nos permite poder recibir peticiones POST en formato JSON
+server.use(express.json())
 
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET,
-});
+server.use("/", router)
 
-const express = require("express");
-const eventoRoutes = require("./src/api/evento/evento.routes");
-const usuarioRoutes = require("./src/api/usuario/usuario.routes");
-const comentarioRoutes = require("./src/api/comentario/comentario.routes");
+server.listen(3000, ()=>{
+    console.log("Servidor online en puerto 3000")
+})
 
-const server = express();
-
-server.use(cors());
-
-server.use(express.json());
-server.use(express.urlencoded({ extended: true }));
-
-server.use("/usuario", usuarioRoutes);
-server.use("/evento", eventoRoutes);
-server.use("/comentario", comentarioRoutes);
-
-server.use((err, req, res, next) => {
-  return res.status(err.status ||  500).json(err.message || "Unexpected error");
-});
-
-server.use("*", (req, res, next) => {
-  return res.status(404).json("Route not found");
-});
-
-server.use("/", (req, res) => {
-  res.send("Working");
-});
-
-server.listen(PORT, () => {
-  console.log("The server is working http://localhost/:" + PORT);
-});
+module.export = server
