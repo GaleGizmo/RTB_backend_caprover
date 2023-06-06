@@ -17,8 +17,8 @@ cloudinary.config({
 });
 
 const express = require("express");
-// const eventoRoutes = require("./src/api/evento/evento.routes");
-// const usuarioRoutes = require("./src/api/usuario/usuario.routes");
+ const eventoRoutes = require("./src/api/evento/evento.routes");
+//const usuarioRoutes = require("./src/api/usuario/usuario.routes");
  const comentarioRoutes = require("./src/api/comentario/comentario.routes");
 
 const server = express();
@@ -29,7 +29,7 @@ server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 
 // server.use("/usuario", usuarioRoutes);
-// server.use("/evento", eventoRoutes);
+ server.use("/evento", eventoRoutes);
  server.use("/comentario", comentarioRoutes);
 
 server.use((err, req, res, next) => {
