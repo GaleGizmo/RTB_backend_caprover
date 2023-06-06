@@ -34,8 +34,8 @@ const setEvento = async (req, res, next) => {
       !user_creator ||
       !site ||
       !price ||
-      !date_start ||
-      !date_end
+      !date_start 
+      
     ) {
       return res.status(400).json({ message: "Faltan campos obligatorios" });
     }
@@ -52,7 +52,8 @@ const setEvento = async (req, res, next) => {
       date_end,
       url,
       image,
-      genretimestamp,
+      genre,
+    timestamp 
     });
 
     await newEvento.save().then(() => {
@@ -101,7 +102,7 @@ const updateEvento = async (req, res, next) => {
 
     if (missingFields.length > 0) {
       return res.status(400).json({
-        error: `Missing required fields: ${missingFields.join(", ")}`,
+        error: `Faltan campos obligatorios: ${missingFields.join(", ")}`,
       });
     }
 
