@@ -38,7 +38,7 @@ const createComentario = async (req, res, next) => {
       !event ||
       !title
     ) {
-      return res.status(400).json({ message: "Faltan campos obligatorios" });
+      return res.status(400).json({message: "Faltan campos obligatorios"});
     }
 
     const nuevoComentario = new Comentario({
@@ -90,7 +90,7 @@ const deleteComentario = async (req, res, next) => {
           return res.status(404).json({ message: "Comentario no encontrado" });
         }
         if (deletedComentario.user.toString() !== userId.toString()) {
-            return res.status(403).json({ message: "No tienes permiso para borrar este comentario" });
+            return res.status(403).json({ message: "No tienes permiso para esta acción" });
           }
       
       return res.status(200).json(deletedComentario);

@@ -36,20 +36,20 @@ const createUsuario = async (req, res, next) => {
     if (!email || !password || !username) {
       return res
         .status(400)
-        .json({ message: "Por favor, completa todos los campos obligatorios" });
+        .json({ message: "Faltan campos obligatorios" });
     }
 
     // Verifica si ya existe un usuario con el mismo email o username
     const existingEmailUser = await Usuario.findOne({ email });
     if (existingEmailUser) {
-      return res.status(400).json({ message: "Ese email ya está en uso" });
+      return res.status(400).json({ message: "Este email ya está en uso" });
     }
 
     const existingUsernameUser = await Usuario.findOne({ username });
     if (existingUsernameUser) {
       return res
         .status(400)
-        .json({ message: "Ese nombre de usuario no está disponible" });
+        .json({ message: "Nombre de usuario no disponible" });
     }
 
     // Asigna role user si se intenta asignar admin

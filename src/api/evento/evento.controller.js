@@ -62,7 +62,7 @@ const setEvento = async (req, res, next) => {
     });
 
     await newEvento.save().then(() => {
-      return res.status(200).json("evento creado con éxito");
+      return res.status(200).json({message: "Evento creado con éxito"});
     });
   } catch (error) {
 
