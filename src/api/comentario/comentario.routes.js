@@ -6,7 +6,7 @@ const { getAllComentarios, getComentariosByUser, getComentariosByEvent, createCo
 
 comentarioRoutes.get('/', getAllComentarios);
 comentarioRoutes.get('/getbyuser/:userId', [isAuth], getComentariosByUser);
-comentarioRoutes.get('/getbyevent/:eventId', [isAuth], getComentariosByEvent);
+comentarioRoutes.get('/getbyevent/:eventId', getComentariosByEvent);
 comentarioRoutes.put('/:idComentario', [isAdminOrComentarioOwner], editComentario);
 comentarioRoutes.post('/', [isAuth], createComentario);
 comentarioRoutes.delete('/:idComentario', [isAdminOrComentarioOwner],deleteComentario);
