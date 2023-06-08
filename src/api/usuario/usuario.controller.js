@@ -21,8 +21,8 @@ const login = async (req, res, next) => {
 
     // Genera el token
     const token = generateSign(user._id, user.username, user.role);
-
-    return res.status(200).json({ token });
+    user.password = null;
+    return res.status(200).json({ token, user });
   } catch (error) {
     return next(error);
   }
