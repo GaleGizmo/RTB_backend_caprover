@@ -20,7 +20,7 @@ const login = async (req, res, next) => {
     }
 
     // Genera el token
-    const token = generateSign(user._id, user.username);
+    const token = generateSign(user._id, user.username, user.role);
 
     return res.status(200).json({ token });
   } catch (error) {
@@ -69,7 +69,7 @@ const createUsuario = async (req, res, next) => {
     const savedUser = await newUser.save();
 
     // Genera el token
-    const token = generateSign(savedUser._id, savedUser.username);
+    const token = generateSign(savedUser._id, savedUser.username, savedUser.role);
 
     return res.status(201).json({ token });
   } catch (error) {
