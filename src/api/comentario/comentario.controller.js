@@ -10,6 +10,7 @@ const getAllComentarios = async (req, res, next) => {
 };
 
 
+
 const getComentariosByUser = async (req, res, next) => {
   try {
     const { userId } = req.params;
@@ -23,7 +24,7 @@ const getComentariosByUser = async (req, res, next) => {
 const getComentariosByEvent = async (req, res, next) => {
   try {
     const { eventId } = req.params;
-    const comentarios = await Comentario.find({ event: eventId });
+    const comentarios = await Comentario.find({ event: eventId }).populate('user');
     return res.status(200).json(comentarios);
   } catch (error) {
     return next(error);
