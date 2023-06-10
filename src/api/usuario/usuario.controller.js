@@ -71,7 +71,7 @@ const createUsuario = async (req, res, next) => {
     // Genera el token
     const token = generateSign(savedUser._id, savedUser.username, savedUser.role);
 
-    return res.status(201).json({ token });
+    return res.status(201).json({ token, user:savedUser });
   } catch (error) {
     return next(error);
   }
