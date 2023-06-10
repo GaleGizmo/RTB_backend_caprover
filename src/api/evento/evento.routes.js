@@ -9,7 +9,7 @@ const upload = require('../../middleware/img.js');
 eventoRoutes.get('/', getAllEventos);
 eventoRoutes.get("/getbyid/:idEvento", getEventoById)
 eventoRoutes.put('/:idEvento', [isAdmin, checkEventMandatoryFields],upload.single("image"),updateEvento);
-eventoRoutes.post('/', [isAdmin, checkEventMandatoryFields],upload.single("image"), setEvento);
+eventoRoutes.post('/', [isAdmin],upload.single("image"), setEvento);
 
 eventoRoutes.delete('/:idEvento', [isAdmin],deleteEvento);
 
