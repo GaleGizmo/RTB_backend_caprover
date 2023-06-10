@@ -60,7 +60,9 @@ const setEvento = async (req, res, next) => {
       genre,
       timestamp
     });
-
+    if (req.file) {
+      newEvento.image = req.file.path;
+    }
     await newEvento.save().then(() => {
       return res.status(200).json({message: "Evento creado con éxito"});
     });
@@ -96,6 +98,13 @@ const updateEvento = async (req, res, next) => {
     //   return res.status(400).json({ message: "Campos obligatorios faltantes" });}
 
     const { idEvento } = req.params;
+    if (req.file) {
+      const oldEvento = await Evento.findById(idEvento);
+      if (oldEvento.image) {
+        deleteImg(oldEvento.image);
+      }
+      req.body.image = req.file.path;
+    }
 
     let eventoToUpdate = await Evento.findById(idEvento);
     if (!eventoToUpdate) {
@@ -106,9 +115,7 @@ const updateEvento = async (req, res, next) => {
    
 
     eventoToUpdate = new Evento(req.body);
-    if (req.file) {
-      eventoToUpdate.body.image = req.file.path;
-    }
+    
     eventoToUpdate._id = idEvento;
 
     const updatedEvento = await Evento.findByIdAndUpdate(
