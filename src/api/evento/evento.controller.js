@@ -27,6 +27,10 @@ const getEventoById = async (req, res, next) => {
 //añade un evento a la BBDD
 const setEvento = async (req, res, next) => {
   try {
+    console.log(req.body);
+    if (!req.body.title || !req.body.subtitle  || !req.body.content || !req.body.site || !req.body.date_start){
+      return res.status(400).json({message: "Faltan campos obligatorios"});
+    }
     
     const {
       title,
