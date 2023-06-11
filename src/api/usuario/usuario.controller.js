@@ -31,7 +31,7 @@ const login = async (req, res, next) => {
 const createUsuario = async (req, res, next) => {
   try {
     console.log(req.body);
-    const { email, password, username, birthday, avatar } = req.body;
+    // const { email, password, username, birthday, avatar } = req.body;
 
     // Comprueba campos obligatorios
     // if (!email || !password || !username) {
@@ -41,12 +41,17 @@ const createUsuario = async (req, res, next) => {
     // }
 
     // Verifica si ya existe un usuario con el mismo email o username
-    const existingEmailUser = await Usuario.findOne({ email });
+    if (!req.body.email){
+      return res.status(400).json( {message: "El email es obligatorio"})
+    }
+    const existingEmailUser = await Usuario.findOne(req.body.email);
     if (existingEmailUser) {
       return res.status(400).json({ message: "Este email ya está en uso" });
     }
-
-    const existingUsernameUser = await Usuario.findOne({ username });
+    if (!req.body.username){
+      return res.status(400).json( {message: "El usuario es obligatorio"})
+    }
+    const existingUsernameUser = await Usuario.findOne(req.body.username);
     if (existingUsernameUser) {
       return res
         .status(400)
@@ -57,14 +62,14 @@ const createUsuario = async (req, res, next) => {
 
     // Crea el nuevo usuario
     const role = 1;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const newUser = new Usuario({
-      email,
+      email: req.body.email,
       password: hashedPassword,
-      username,
+      username: req.body.username,
       role,
-      birthday,
-      avatar,
+      birthday:req.body.birthday,
+      
     });
     if (req.file) {
       newUser.avatar = req.file.path;
