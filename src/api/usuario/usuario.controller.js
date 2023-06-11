@@ -67,7 +67,7 @@ const createUsuario = async (req, res, next) => {
       email: req.body.email,
       password: hashedPassword,
       username: req.body.username,
-      role,
+      role: role,
       birthday:req.body.birthday,
       
     });
