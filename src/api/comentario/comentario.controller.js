@@ -69,8 +69,10 @@ const editComentario = async (req, res, next) => {
       return res.status(404).json({ message: "Comentario no encontrado" });
     }
 
-   
-    if (title) comentarioToUpdate.title = title;
+   if (!title){
+    return res.status(404).json({ message: "Debes poner algo en el título" });
+   } else 
+     {comentarioToUpdate.title = title;}
     if (content) comentarioToUpdate.content = content;
     if (value) comentarioToUpdate.value = value;
 
