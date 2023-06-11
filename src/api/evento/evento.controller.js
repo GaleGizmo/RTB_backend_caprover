@@ -27,6 +27,7 @@ const getEventoById = async (req, res, next) => {
 //añade un evento a la BBDD
 const setEvento = async (req, res, next) => {
   try {
+    
     const {
       title,
       subtitle,

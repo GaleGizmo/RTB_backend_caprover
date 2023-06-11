@@ -30,6 +30,7 @@ const login = async (req, res, next) => {
 
 const createUsuario = async (req, res, next) => {
   try {
+    console.log(req.body);
     const { email, password, username, birthday, avatar } = req.body;
 
     // Comprueba campos obligatorios
