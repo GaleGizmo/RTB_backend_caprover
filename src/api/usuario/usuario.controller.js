@@ -44,14 +44,14 @@ const createUsuario = async (req, res, next) => {
     if (!req.body.email){
       return res.status(400).json( {message: "El email es obligatorio"})
     }
-    const existingEmailUser = await Usuario.findOne(req.body.email);
+    const existingEmailUser = await Usuario.findOne({email:req.body.email});
     if (existingEmailUser) {
       return res.status(400).json({ message: "Este email ya está en uso" });
     }
     if (!req.body.username){
       return res.status(400).json( {message: "El usuario es obligatorio"})
     }
-    const existingUsernameUser = await Usuario.findOne(req.body.username);
+    const existingUsernameUser = await Usuario.findOne({username:req.body.username});
     if (existingUsernameUser) {
       return res
         .status(400)
