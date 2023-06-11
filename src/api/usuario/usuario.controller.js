@@ -33,11 +33,11 @@ const createUsuario = async (req, res, next) => {
     const { email, password, username, birthday, avatar } = req.body;
 
     // Comprueba campos obligatorios
-    if (!email || !password || !username) {
-      return res
-        .status(400)
-        .json({ message: "Faltan campos obligatorios" });
-    }
+    // if (!email || !password || !username) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "Faltan campos obligatorios" });
+    // }
 
     // Verifica si ya existe un usuario con el mismo email o username
     const existingEmailUser = await Usuario.findOne({ email });
@@ -65,7 +65,9 @@ const createUsuario = async (req, res, next) => {
       birthday,
       avatar,
     });
-
+    if (req.file) {
+      newUser.avatar = req.file.path;
+    }
     const savedUser = await newUser.save();
 
     // Genera el token
