@@ -29,9 +29,9 @@ const getEventoById = async (req, res, next) => {
 const setEvento = async (req, res, next) => {
   try {
     
-    if (!req.body.title || !req.body.subtitle  || !req.body.content || !req.body.site || !req.body.date_start){
-      return res.status(400).json({message: "Faltan campos obligatorios"});
-    }
+    // if (!req.body.title || !req.body.subtitle  || !req.body.content || !req.body.site || !req.body.date_start){
+    //   return res.status(400).json({message: "Faltan campos obligatorios"});
+    // }
     
     const {
       title,
