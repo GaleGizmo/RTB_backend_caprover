@@ -41,17 +41,19 @@ const createUsuario = async (req, res, next) => {
     // }
 
     // Verifica si ya existe un usuario con el mismo email o username
-    if (!req.body.email){
-      return res.status(400).json( {message: "El email es obligatorio"})
+    if (!req.body.email) {
+      return res.status(400).json({ message: "El email es obligatorio" });
     }
-    const existingEmailUser = await Usuario.findOne({email:req.body.email});
+    const existingEmailUser = await Usuario.findOne({ email: req.body.email });
     if (existingEmailUser) {
       return res.status(400).json({ message: "Este email ya está en uso" });
     }
-    if (!req.body.username){
-      return res.status(400).json( {message: "El usuario es obligatorio"})
+    if (!req.body.username) {
+      return res.status(400).json({ message: "El usuario es obligatorio" });
     }
-    const existingUsernameUser = await Usuario.findOne({username:req.body.username});
+    const existingUsernameUser = await Usuario.findOne({
+      username: req.body.username,
+    });
     if (existingUsernameUser) {
       return res
         .status(400)
@@ -68,8 +70,7 @@ const createUsuario = async (req, res, next) => {
       password: hashedPassword,
       username: req.body.username,
       role: role,
-      birthday:req.body.birthday,
-      
+      birthday: req.body.birthday,
     });
     if (req.file) {
       newUser.avatar = req.file.path;
@@ -77,9 +78,13 @@ const createUsuario = async (req, res, next) => {
     const savedUser = await newUser.save();
 
     // Genera el token
-    const token = generateSign(savedUser._id, savedUser.username, savedUser.role);
+    const token = generateSign(
+      savedUser._id,
+      savedUser.username,
+      savedUser.role
+    );
 
-    return res.status(201).json({ token, user:savedUser });
+    return res.status(201).json({ token, user: savedUser });
   } catch (error) {
     return next(error);
   }
@@ -88,7 +93,7 @@ const createUsuario = async (req, res, next) => {
 const editUsuario = async (req, res, next) => {
   try {
     const { idUsuario } = req.params;
-    
+
     const { email, password, username, birthday, avatar } = req.body;
 
     // Busca al usuario por su ID
@@ -97,16 +102,14 @@ const editUsuario = async (req, res, next) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-   
     // Actualiza los datos del usuario si es procedente
-   
+
     if (email) userToUpdate.email = email;
     if (password) {
       const hashedPassword = await bcrypt.hash(password, 10);
       userToUpdate.password = hashedPassword;
     }
-    
-   
+
     if (username) userToUpdate.username = username;
     if (birthday) userToUpdate.birthday = birthday;
     if (avatar) userToUpdate.avatar = avatar;

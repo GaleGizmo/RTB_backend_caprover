@@ -6,12 +6,11 @@ const Evento = require("./evento.model");
 //recoge todos los eventos de la BBDD
 const getAllEventos = async (req, res, next) => {
   try {
-    const eventos = await Evento.find()
+    const eventos = await Evento.find();
 
-    return res.json(eventos)
-
+    return res.json(eventos);
   } catch (error) {
-    return next(error)
+    return next(error);
   }
 };
 
@@ -28,11 +27,10 @@ const getEventoById = async (req, res, next) => {
 //añade un evento a la BBDD
 const setEvento = async (req, res, next) => {
   try {
-    
     // if (!req.body.title || !req.body.subtitle  || !req.body.content || !req.body.site || !req.body.date_start){
     //   return res.status(400).json({message: "Faltan campos obligatorios"});
     // }
-    
+
     const {
       title,
       subtitle,
@@ -47,10 +45,6 @@ const setEvento = async (req, res, next) => {
       genre,
     } = req.body;
 
-   
-
-
-
     const timestamp = new Date();
     const newEvento = new Evento({
       title,
@@ -64,16 +58,15 @@ const setEvento = async (req, res, next) => {
       url,
       image,
       genre,
-      timestamp
+      timestamp,
     });
     if (req.file) {
       newEvento.image = req.file.path;
     }
     await newEvento.save().then(() => {
-      return res.status(200).json({message: "Evento creado con éxito"});
+      return res.status(200).json({ message: "Evento creado con éxito" });
     });
   } catch (error) {
-
     return next(error);
   }
 };
@@ -91,14 +84,25 @@ const deleteEvento = async (req, res, next) => {
 
     return res.status(200).json(deletedEvento);
   } catch (error) {
-    return next(error);
+    if (error.name === 'ValidationError') {
+      // Manejo de errores de validación
+      return res.status(400).json({ message: 'Error de validación', error: error.message });
+    } else if (error.name === 'MongoError' && error.code === 11000) {
+      // Manejo de errores de duplicados (si se tiene un índice único en el modelo)
+      return res.status(400).json({ message: 'Error de duplicado', error: error.message });
+    } else if (error.name === 'CastError' && error.kind === 'ObjectId') {
+      // Manejo de errores de ID inválido
+      return res.status(400).json({ message: 'ID de evento inválido' });
+    } else {
+      // Manejo de otros errores de la base de datos
+      return res.status(500).json({ message: 'Error de base de datos', error: error.message });
+    }
   }
 };
 
 //actualiza un evento de la BBDD
 const updateEvento = async (req, res, next) => {
   try {
-    
     // if (!req.body.title || !req.body.subtitle  || !req.body.content || !req.body.site || !req.body.date_start){
     //   return res.status(400).json({message: "Faltan campos obligatorios"});
     // }
@@ -117,11 +121,8 @@ const updateEvento = async (req, res, next) => {
       return res.status(404).json({ message: "Evento no encontrado" });
     }
 
-   
-   
-
     eventoToUpdate = new Evento(req.body);
-    
+
     eventoToUpdate._id = idEvento;
 
     const updatedEvento = await Evento.findByIdAndUpdate(
@@ -136,4 +137,10 @@ const updateEvento = async (req, res, next) => {
   }
 };
 
-module.exports = { getAllEventos, getEventoById, setEvento, updateEvento, deleteEvento };
+module.exports = {
+  getAllEventos,
+  getEventoById,
+  setEvento,
+  updateEvento,
+  deleteEvento,
+};

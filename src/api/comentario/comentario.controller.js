@@ -1,4 +1,4 @@
-const Comentario=require('./comentario.model')
+const Comentario = require("./comentario.model");
 
 const getAllComentarios = async (req, res, next) => {
   try {
@@ -8,8 +8,6 @@ const getAllComentarios = async (req, res, next) => {
     return next(error);
   }
 };
-
-
 
 const getComentariosByUser = async (req, res, next) => {
   try {
@@ -24,7 +22,9 @@ const getComentariosByUser = async (req, res, next) => {
 const getComentariosByEvent = async (req, res, next) => {
   try {
     const { eventId } = req.params;
-    const comentarios = await Comentario.find({ event: eventId }).populate('user');
+    const comentarios = await Comentario.find({ event: eventId }).populate(
+      "user"
+    );
     return res.status(200).json(comentarios);
   } catch (error) {
     return next(error);
@@ -34,12 +34,8 @@ const createComentario = async (req, res, next) => {
   try {
     const { user, event, title, content, value } = req.body;
 
-    if (
-      !user ||
-      !event ||
-      !title
-    ) {
-      return res.status(400).json({message: "Faltan campos obligatorios"});
+    if (!user || !event || !title) {
+      return res.status(400).json({ message: "Faltan campos obligatorios" });
     }
 
     const nuevoComentario = new Comentario({
@@ -47,7 +43,7 @@ const createComentario = async (req, res, next) => {
       event,
       title,
       content,
-      value
+      value,
     });
 
     const comentarioCreado = await nuevoComentario.save();
@@ -60,7 +56,7 @@ const createComentario = async (req, res, next) => {
 const editComentario = async (req, res, next) => {
   try {
     const { idComentario } = req.params;
-    
+
     const { title, content, value } = req.body;
 
     const comentarioToUpdate = await Comentario.findById(idComentario);
@@ -69,10 +65,11 @@ const editComentario = async (req, res, next) => {
       return res.status(404).json({ message: "Comentario no encontrado" });
     }
 
-   if (!title){
-    return res.status(404).json({ message: "Debes poner algo en el título" });
-   } else 
-     {comentarioToUpdate.title = title;}
+    if (!title) {
+      return res.status(404).json({ message: "Debes poner algo en el título" });
+    } else {
+      comentarioToUpdate.title = title;
+    }
     if (content) comentarioToUpdate.content = content;
     if (value) comentarioToUpdate.value = value;
 
@@ -84,22 +81,31 @@ const editComentario = async (req, res, next) => {
 };
 
 const deleteComentario = async (req, res, next) => {
-    try {
-      const { idComentario } = req.params;
-      const userId = req.user._id;
-      const deletedComentario = await Comentario.findByIdAndDelete(idComentario);
-  
-      if (!deletedComentario) {
-          return res.status(404).json({ message: "Comentario no encontrado" });
-        }
-        if (deletedComentario.user.toString() !== userId.toString()) {
-            return res.status(403).json({ message: "No tienes permiso para esta acción" });
-          }
-      
-      return res.status(200).json(deletedComentario);
-    } catch (error) {
-      return next(error);
-    }
-  };
+  try {
+    const { idComentario } = req.params;
+    const userId = req.user._id;
+    const deletedComentario = await Comentario.findByIdAndDelete(idComentario);
 
-  module.exports={getAllComentarios, getComentariosByUser, getComentariosByEvent, editComentario, createComentario, deleteComentario}
+    if (!deletedComentario) {
+      return res.status(404).json({ message: "Comentario no encontrado" });
+    }
+    if (deletedComentario.user.toString() !== userId.toString()) {
+      return res
+        .status(403)
+        .json({ message: "No tienes permiso para esta acción" });
+    }
+
+    return res.status(200).json(deletedComentario);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+module.exports = {
+  getAllComentarios,
+  getComentariosByUser,
+  getComentariosByEvent,
+  editComentario,
+  createComentario,
+  deleteComentario,
+};

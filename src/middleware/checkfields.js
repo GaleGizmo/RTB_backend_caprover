@@ -1,6 +1,5 @@
-
 function checkEventMandatoryFields(req, res, next) {
-const requiredFields = [
+  const requiredFields = [
     "title",
     "subtitle",
     "content",
@@ -18,5 +17,4 @@ const requiredFields = [
   } else next();
 }
 
-
-module.exports = {checkEventMandatoryFields}
+module.exports = { checkEventMandatoryFields };
