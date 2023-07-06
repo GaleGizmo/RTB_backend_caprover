@@ -16,7 +16,7 @@ function enviarCorreoElectronico(destinatarios, evento) {
       subject: 'Nuevo evento musical',
       text: `¡Hola! Se ha añadido un nuevo evento musical: ${evento.title}. No te lo pierdas.`,
     };
-  
+  console.log(mensaje);
     transporter.sendMail(mensaje, (error, info) => {
       if (error) {
         console.log('Error al enviar el correo electrónico:', error);

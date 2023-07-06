@@ -1,7 +1,7 @@
 const { checkMandatoryFields } = require("../../middleware/checkfields");
 const { deleteImg } = require("../../middleware/deleteImg");
 const enviarCorreoElectronico = require("../../utils/email");
-const Usuario=require("../usuario/usuario.model")
+const User=require("../usuario/usuario.model");
 const Evento = require("./evento.model");
 
 //recoge todos los eventos de la BBDD
@@ -63,8 +63,9 @@ const setEvento = async (req, res, next) => {
       newEvento.image = req.file.path;
     }
     await newEvento.save()
-      const usuarios = await Usuario.find({ newsletter: true }, 'email');
+      const usuarios = await User.find({ newsletter: true }, 'email');
       const destinatarios = usuarios.map((usuario) => usuario.email);
+      console.log(destinatarios);
       enviarCorreoElectronico(destinatarios, newEvento);
       return res.status(200).json({ message: "Evento creado con éxito" });
 
