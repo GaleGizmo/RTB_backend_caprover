@@ -2,6 +2,7 @@ const { generateSign } = require("../../utils/jwt");
 
 const bcrypt = require("bcrypt");
 const Usuario = require("./usuario.model");
+const { deleteImg } = require("../../middleware/deleteImg");
 
 const login = async (req, res, next) => {
   try {
@@ -31,14 +32,7 @@ const login = async (req, res, next) => {
 const createUsuario = async (req, res, next) => {
   try {
     console.log(req.body);
-    // const { email, password, username, birthday, avatar } = req.body;
-
-    // Comprueba campos obligatorios
-    // if (!email || !password || !username) {
-    //   return res
-    //     .status(400)
-    //     .json({ message: "Faltan campos obligatorios" });
-    // }
+ 
 
     // Verifica si ya existe un usuario con el mismo email o username
     if (!req.body.email) {
@@ -61,9 +55,9 @@ const createUsuario = async (req, res, next) => {
     }
 
     // Asigna role user si se intenta asignar admin
-
-    // Crea el nuevo usuario
     const role = 1;
+    // Crea el nuevo usuario
+
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const newUser = new Usuario({
       email: req.body.email,
@@ -71,6 +65,7 @@ const createUsuario = async (req, res, next) => {
       username: req.body.username,
       role: role,
       birthday: req.body.birthday,
+      newsletter: req.body.newsletter,
     });
     if (req.file) {
       newUser.avatar = req.file.path;
@@ -94,14 +89,25 @@ const editUsuario = async (req, res, next) => {
   try {
     const { idUsuario } = req.params;
 
-    const { email, password, username, birthday, avatar } = req.body;
+    const { email, password, username, newsletter, avatar } = req.body;
 
     // Busca al usuario por su ID
     const userToUpdate = await Usuario.findById(idUsuario);
     if (!userToUpdate) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
-
+    const existingEmailUser = await Usuario.findOne({ email: email });
+    if (existingEmailUser) {
+      return res.status(400).json({ message: "Este email ya está en uso" });
+    }
+    const existingUsernameUser = await Usuario.findOne({
+      username: username,
+    });
+    if (existingUsernameUser) {
+      return res
+        .status(400)
+        .json({ message: "Nombre de usuario no disponible" });
+    }
     // Actualiza los datos del usuario si es procedente
 
     if (email) userToUpdate.email = email;
@@ -111,8 +117,14 @@ const editUsuario = async (req, res, next) => {
     }
 
     if (username) userToUpdate.username = username;
-    if (birthday) userToUpdate.birthday = birthday;
-    if (avatar) userToUpdate.avatar = avatar;
+    if (newsletter) userToUpdate.newsletter = newsletter;
+    if (req.file) {
+      const oldUsuario = await Usuario.findById(idUsuario);
+      if (oldUsuario.avatar) {
+        deleteImg(oldUsuario.avatar);
+      }
+      userToUpdate.avatar = req.file.path;
+    }
 
     // Guarda los cambios en la base de datos
     const updatedUser = await userToUpdate.save();

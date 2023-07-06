@@ -1,6 +1,7 @@
 const { checkMandatoryFields } = require("../../middleware/checkfields");
 const { deleteImg } = require("../../middleware/deleteImg");
-
+const enviarCorreoElectronico = require("../../utils/email");
+const Usuario=require("../usuario/usuario.model")
 const Evento = require("./evento.model");
 
 //recoge todos los eventos de la BBDD
@@ -27,9 +28,7 @@ const getEventoById = async (req, res, next) => {
 //añade un evento a la BBDD
 const setEvento = async (req, res, next) => {
   try {
-    // if (!req.body.title || !req.body.subtitle  || !req.body.content || !req.body.site || !req.body.date_start){
-    //   return res.status(400).json({message: "Faltan campos obligatorios"});
-    // }
+    
 
     const {
       title,
@@ -63,9 +62,12 @@ const setEvento = async (req, res, next) => {
     if (req.file) {
       newEvento.image = req.file.path;
     }
-    await newEvento.save().then(() => {
+    await newEvento.save()
+      const usuarios = await Usuario.find({ newsletter: true }, 'email');
+      const destinatarios = usuarios.map((usuario) => usuario.email);
+      enviarCorreoElectronico(destinatarios, newEvento);
       return res.status(200).json({ message: "Evento creado con éxito" });
-    });
+
   } catch (error) {
     return next(error);
   }
