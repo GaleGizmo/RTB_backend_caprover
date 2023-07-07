@@ -1,7 +1,7 @@
 const { checkMandatoryFields } = require("../../middleware/checkfields");
 const { deleteImg } = require("../../middleware/deleteImg");
 const enviarCorreoElectronico = require("../../utils/email");
-const User=require("../usuario/usuario.model");
+const User = require("../usuario/usuario.model");
 const Evento = require("./evento.model");
 
 //recoge todos los eventos de la BBDD
@@ -28,8 +28,6 @@ const getEventoById = async (req, res, next) => {
 //añade un evento a la BBDD
 const setEvento = async (req, res, next) => {
   try {
-    
-
     const {
       title,
       subtitle,
@@ -62,13 +60,12 @@ const setEvento = async (req, res, next) => {
     if (req.file) {
       newEvento.image = req.file.path;
     }
-    await newEvento.save()
-      const usuarios = await User.find({ newsletter: true }, 'email');
-      const destinatarios = usuarios.map((usuario) => usuario.email);
-      console.log(destinatarios);
-      enviarCorreoElectronico(destinatarios, newEvento);
-      return res.status(200).json({ message: "Evento creado con éxito" });
-
+    await newEvento.save();
+    const usuarios = await User.find({ newsletter: true }, "email");
+    const destinatarios = usuarios.map((usuario) => usuario.email);
+    console.log(destinatarios);
+    await enviarCorreoElectronico(destinatarios, newEvento);
+    return res.status(200).json({ message: "Evento creado con éxito" });
   } catch (error) {
     return next(error);
   }
@@ -87,18 +84,24 @@ const deleteEvento = async (req, res, next) => {
 
     return res.status(200).json(deletedEvento);
   } catch (error) {
-    if (error.name === 'ValidationError') {
+    if (error.name === "ValidationError") {
       // Manejo de errores de validación
-      return res.status(400).json({ message: 'Error de validación', error: error.message });
-    } else if (error.name === 'MongoError' && error.code === 11000) {
+      return res
+        .status(400)
+        .json({ message: "Error de validación", error: error.message });
+    } else if (error.name === "MongoError" && error.code === 11000) {
       // Manejo de errores de duplicados (si se tiene un índice único en el modelo)
-      return res.status(400).json({ message: 'Error de duplicado', error: error.message });
-    } else if (error.name === 'CastError' && error.kind === 'ObjectId') {
+      return res
+        .status(400)
+        .json({ message: "Error de duplicado", error: error.message });
+    } else if (error.name === "CastError" && error.kind === "ObjectId") {
       // Manejo de errores de ID inválido
-      return res.status(400).json({ message: 'ID de evento inválido' });
+      return res.status(400).json({ message: "ID de evento inválido" });
     } else {
       // Manejo de otros errores de la base de datos
-      return res.status(500).json({ message: 'Error de base de datos', error: error.message });
+      return res
+        .status(500)
+        .json({ message: "Error de base de datos", error: error.message });
     }
   }
 };
