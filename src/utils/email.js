@@ -1,29 +1,27 @@
-const nodemailer = require('nodemailer');
 require('dotenv').config();
+const ElasticEmail = require('elasticemail');
 
-const transporter = nodemailer.createTransport({
-  service: 'Gmail', 
-  auth: {
-    user: 'rockthebarrio@gmail.com',
-    pass: process.env.EMAIL_SECRET
-  },
+const elasticemail = new ElasticEmail({
+  apiKey: process.env.API_EMAIL,
 });
-function enviarCorreoElectronico(destinatarios, evento) {
+
+
+const enviarCorreoElectronico=async(destinatarios, evento)=> {
     const mensaje = {
-      from: 'rockthebarrio@gmail.com', 
-      to: 'rockthebarrio@gmail.com', 
+      from: 'RockTheBarrio@gmail.com', 
+      to: 'RockTheBarrio@gmail.com', 
       bcc: destinatarios, 
       subject: 'Nuevo evento musical',
       text: `¡Hola! Se ha añadido un nuevo evento musical: ${evento.title}. No te lo pierdas.`,
     };
-  console.log(mensaje);
-    transporter.sendMail(mensaje, (error, info) => {
-      if (error) {
-        console.log('Error al enviar el correo electrónico:', error);
-      } else {
-        console.log('Correo electrónico enviado:', info.response);
-      }
-    });
+  
+  
+  try {
+    const respuesta = await elasticemail.send(mensaje);
+    console.log('Correo electrónico enviado:', respuesta);
+  } catch (error) {
+    console.error('Error al enviar el correo electrónico:', error);
   }
+}
 
 module.exports = enviarCorreoElectronico;
