@@ -61,12 +61,15 @@ const setEvento = async (req, res, next) => {
       newEvento.image = req.file.path;
     }
     await newEvento.save();
-    const usuarios = await User.find({ newsletter: true }, "email").lean();
-    const destinatarios = usuarios.map((usuario) => usuario.email);
-   for (const destinatario of destinatarios){
-    await enviarCorreoElectronico(destinatario, newEvento);
-   }
-    
+    const usuarios = await User.find(
+      { newsletter: true },
+      "email username"
+    ).lean();
+
+    for (const usuario of usuarios) {
+      await enviarCorreoElectronico(usuario, newEvento);
+    }
+
     return res.status(200).json({ message: "Evento creado con éxito" });
   } catch (error) {
     return next(error);

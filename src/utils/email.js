@@ -25,13 +25,31 @@ const enviarCorreoElectronico = async (destinatario, evento) => {
         accessToken: accessToken,
       },
     });
+    const dia = evento.date_start.getDate();
+    const mes = evento.date_start.getMonth();
+    const mesesEnGallego = [
+      "Xaneiro",
+      "Febreiro",
+      "Marzo",
+      "Abril",
+      "Maio",
+      "Xuño",
+      "Xullo",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Decembro",
+    ];
+    
+    const nombreMes = mesesEnGallego[mes];
 
     const mensaje = {
       from: "rockthebarrio@gmail.com",
-      to: destinatario,
+      to: destinatario.email,
       subject: "Novo evento musical",
-      html: `<p>Ola! Engadiuse un novo evento musical: ${evento.title}.</p>
-        <p>Máis información  <a href="https://rock-the-barrio-front-one.vercel.app/"> aquí.</a></p>`,
+      html: `<p>Ola, ${destinatario.username}! Engadiuse un novo evento musical:<strong> ${evento.title}</strong> o día <strong>${dia}</strong> de<strong> ${nombreMes}</strong>.</p>
+        <p>Máis información  <a href="https://rock-the-barrio-front-one.vercel.app"> aquí.</a></p>`,
     };
 
     const respuesta = await transporter.sendMail(mensaje);
