@@ -1,6 +1,7 @@
 const { checkMandatoryFields } = require("../../middleware/checkfields");
 const { deleteImg } = require("../../middleware/deleteImg");
-const enviarCorreoElectronico = require("../../utils/email");
+const {enviarCorreoElectronico, enviarCorreoSemanal} = require("../../utils/email");
+
 const User = require("../usuario/usuario.model");
 const Evento = require("./evento.model");
 
@@ -15,6 +16,37 @@ const getAllEventos = async (req, res, next) => {
   }
 };
 
+//manda por mail eventos de la semana
+const sendEventosSemanales = async () => {
+  const hoy = new Date();
+  
+  //obtenemos la fecha de inicio de la semana y de fin de la semana
+  const fechaInicioSemana = new Date(
+    hoy.getFullYear(),
+    hoy.getMonth(),
+    hoy.getDate() 
+  );
+  const fechaFinSemana = new Date(
+    hoy.getFullYear(),
+    hoy.getMonth(),
+    hoy.getDate() + (6 )
+  );
+
+  try {
+    const eventosSemana = await Evento.find({
+      date_start: { $gte: fechaInicioSemana, $lte: fechaFinSemana },
+    }).sort({ date_start: 1 });
+
+    const usuarios = await User.find({ newsletter: true }, "email username");
+
+    for (const usuario of usuarios) {
+      await enviarCorreoSemanal(usuario, eventosSemana);
+    }
+  } catch (error) {
+    console.error("Error al obtener eventos semanales:", error);
+  }
+};
+// sendEventosSemanales()
 //Recogemos un evento por id
 const getEventoById = async (req, res, next) => {
   try {
@@ -150,6 +182,7 @@ const updateEvento = async (req, res, next) => {
 
 module.exports = {
   getAllEventos,
+  sendEventosSemanales,
   getEventoById,
   setEvento,
   updateEvento,
