@@ -17,7 +17,7 @@ const getAllEventos = async (req, res, next) => {
 };
 
 //manda por mail eventos de la semana
-const sendEventosSemanales = async () => {
+const sendEventosSemanales = async (req, res, next) => {
   const hoy = new Date();
   
   //obtenemos la fecha de inicio de la semana y de fin de la semana
@@ -42,6 +42,7 @@ const sendEventosSemanales = async () => {
     for (const usuario of usuarios) {
       await enviarCorreoSemanal(usuario, eventosSemana);
     }
+ return res.json("eventos enviados")
   } catch (error) {
     console.error("Error al obtener eventos semanales:", error);
   }
