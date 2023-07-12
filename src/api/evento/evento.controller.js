@@ -95,7 +95,7 @@ const setEvento = async (req, res, next) => {
     }
     await newEvento.save();
     const usuarios = await User.find(
-      { newsletter: true },
+      { newevent: true },
       "email username"
     ).lean();
 

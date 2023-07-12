@@ -9,6 +9,7 @@ const usuarioSchema = mongoose.Schema(
         birthday:{type:Date, required:false, unique:false},
         avatar:{type:String, required:false, unique:false},
         newsletter: { type: Boolean, required: false, default: false },
+        newevent: { type: Boolean, required: false, default: false },
     },
     {
         timestamps:true,
