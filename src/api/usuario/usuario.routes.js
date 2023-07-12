@@ -7,5 +7,5 @@ const { createUsuario, deleteUsuario, login, editUsuario } = require('./usuario.
 usuarioRoutes.post('/register', upload.single("avatar"),createUsuario);
 usuarioRoutes.post('/login', login);
 usuarioRoutes.put('/:idUsuario',[isAdminOrOwner], upload.single("avatar"), editUsuario);
-usuarioRoutes.delete('/:idUsuario',[isAdmin], deleteUsuario);
+usuarioRoutes.delete('/:idUsuario',[isAdminOrOwner], deleteUsuario);
 module.exports=usuarioRoutes;

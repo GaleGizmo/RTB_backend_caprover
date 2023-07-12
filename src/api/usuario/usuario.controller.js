@@ -145,7 +145,8 @@ const deleteUsuario = async (req, res, next) => {
     if (!usuarioToDelete) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     } else {
-      deleteImg(usuarioToDelete.avatar)
+      if (usuarioToDelete.avatar)
+      {deleteImg(usuarioToDelete.avatar)}
       return res.status(200).json(usuarioToDelete);
     }
   } catch (error) {
