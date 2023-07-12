@@ -66,6 +66,7 @@ const createUsuario = async (req, res, next) => {
       role: role,
       birthday: req.body.birthday,
       newsletter: req.body.newsletter,
+      newevent: req.body.newevent,
     });
     if (req.file) {
       newUser.avatar = req.file.path;
@@ -89,7 +90,7 @@ const editUsuario = async (req, res, next) => {
   try {
     const { idUsuario } = req.params;
 
-    const { email, password, username, newsletter, avatar } = req.body;
+    const { email, password, username, newsletter, newevent, avatar } = req.body;
 
     // Busca al usuario por su ID
     const userToUpdate = await Usuario.findById(idUsuario);
@@ -118,6 +119,7 @@ const editUsuario = async (req, res, next) => {
 
     if (username) userToUpdate.username = username;
     if (newsletter) userToUpdate.newsletter = newsletter;
+    if (newevent) userToUpdate.newevent = newevent;
     if (req.file) {
       const oldUsuario = await Usuario.findById(idUsuario);
       if (oldUsuario.avatar) {
@@ -143,6 +145,7 @@ const deleteUsuario = async (req, res, next) => {
     if (!usuarioToDelete) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     } else {
+      deleteImg(usuarioToDelete.avatar)
       return res.status(200).json(usuarioToDelete);
     }
   } catch (error) {
