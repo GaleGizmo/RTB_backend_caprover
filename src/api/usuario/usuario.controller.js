@@ -9,7 +9,10 @@ const login = async (req, res, next) => {
     const { username, password } = req.body;
 
     // Busca al usuario por  username
-    const user = await Usuario.findOne({ username });
+    const user = await Usuario.findOne({
+      $or:[{username:username},
+        {email:username}] });
+   
     if (!user) {
       return res.status(401).json({ message: "Credenciales erróneas" });
     }
