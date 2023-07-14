@@ -1,4 +1,4 @@
-const { generateSign } = require("../../utils/jwt");
+const { generateSign, generateTempToken } = require("../../utils/jwt");
 
 const bcrypt = require("bcrypt");
 const Usuario = require("./usuario.model");
@@ -158,12 +158,13 @@ const deleteUsuario = async (req, res, next) => {
   }
 };
 const forgotPassword = async (req, res, next) => {
+  const { email } = req.body;
   try {
     const user = await Usuario.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
-    const token = generateSign();
+    const token = generateTempToken(user._id);
     user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + 3600000; // Token válido por 1 hora
     await user.save();

@@ -9,5 +9,9 @@ const generateSign = (id, username, role) => {
 const verifyJwt = (token) => {
   return jwt.verify(token, process.env.JWT_SECRET);
 };
-
-module.exports = { generateSign, verifyJwt };
+const generateTempToken = (id)=>{
+  return jwt.sign({id}, process.env.JWT_SECRET, {
+    expiresIn: "1h",
+  })
+}
+module.exports = { generateSign, verifyJwt, generateTempToken };
