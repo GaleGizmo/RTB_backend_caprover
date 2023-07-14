@@ -186,4 +186,4 @@ const forgotPassword = async (req, res, next) => {
       });
   }
 };
-module.exports = { login, createUsuario, editUsuario, deleteUsuario };
+module.exports = { login, createUsuario, editUsuario, forgotPassword, deleteUsuario };
