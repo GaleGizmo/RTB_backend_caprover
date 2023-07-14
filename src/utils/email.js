@@ -89,5 +89,27 @@ const enviarCorreoElectronico = async (destinatario, evento) => {
     console.error("Error al enviar el correo electrónico:", error);
   }
 };
+const enviarCorreoRecuperacion = async (destinatario, token) => {
+  try {
+    const transporter = await createTransporter();
 
-module.exports = { enviarCorreoElectronico, enviarCorreoSemanal };
+    const mensaje = {
+      from: "rockthebarrio@gmail.com",
+      to: destinatario.email,
+      subject: "Recuperación de contrasinal",
+      html: `<p>Ola, ${destinatario.username},</p>
+             <p>Solicitaches restablecer o teu contrasinal na nosa aplicación.</p>
+             <p>Clica no seguinte enlace para cambia-lo teu  contrasinal:</p>
+             <a href="https://tuapp.com/reset-password/${token}">Restablecer contrasinal</a>
+             <p>Se non solicitaches restablece-lo teu contrasinal, ignora este correo.</p>
+             <p>Grazas,</p>
+             <p>Rock The Barrio</p></p>`,
+    };
+
+    const respuesta = await transporter.sendMail(mensaje);
+    console.log("Correo electrónico enviado:", respuesta);
+  } catch (error) {
+    console.error("Error al enviar el correo electrónico:", error);
+  }
+};
+module.exports = { enviarCorreoElectronico, enviarCorreoSemanal, enviarCorreoRecuperacion };

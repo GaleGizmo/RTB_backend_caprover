@@ -10,9 +10,9 @@ const login = async (req, res, next) => {
 
     // Busca al usuario por  username
     const user = await Usuario.findOne({
-      $or:[{username:username},
-        {email:username}] });
-   
+      $or: [{ username: username }, { email: username }],
+    });
+
     if (!user) {
       return res.status(401).json({ message: "Credenciales erróneas" });
     }
@@ -35,7 +35,6 @@ const login = async (req, res, next) => {
 const createUsuario = async (req, res, next) => {
   try {
     console.log(req.body);
- 
 
     // Verifica si ya existe un usuario con el mismo email o username
     if (!req.body.email) {
@@ -93,7 +92,8 @@ const editUsuario = async (req, res, next) => {
   try {
     const { idUsuario } = req.params;
 
-    const { email, password, username, newsletter, newevent, avatar } = req.body;
+    const { email, password, username, newsletter, newevent, avatar } =
+      req.body;
 
     // Busca al usuario por su ID
     const userToUpdate = await Usuario.findById(idUsuario);
@@ -148,13 +148,42 @@ const deleteUsuario = async (req, res, next) => {
     if (!usuarioToDelete) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     } else {
-      if (usuarioToDelete.avatar)
-      {deleteImg(usuarioToDelete.avatar)}
+      if (usuarioToDelete.avatar) {
+        deleteImg(usuarioToDelete.avatar);
+      }
       return res.status(200).json(usuarioToDelete);
     }
   } catch (error) {
     return next(error);
   }
 };
-
+const forgotPassword = async (req, res, next) => {
+  try {
+    const user = await Usuario.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+    const token = generateSign();
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 3600000; // Token válido por 1 hora
+    await user.save();
+    await enviarCorreoRecuperacion(user, token);
+    res
+      .status(200)
+      .json({
+        message:
+          "Se ha enviado un correo electrónico de recuperación de contraseña",
+      });
+  } catch (error) {
+    console.error(
+      "Error al procesar la solicitud de recuperación de contraseña:",
+      error
+    );
+    res
+      .status(500)
+      .json({
+        message: "Error al procesar la solicitud de recuperación de contraseña",
+      });
+  }
+};
 module.exports = { login, createUsuario, editUsuario, deleteUsuario };
