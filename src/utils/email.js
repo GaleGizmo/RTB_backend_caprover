@@ -35,11 +35,13 @@ const enviarCorreoSemanal = async (destinatario, eventos) => {
     for (const evento of eventos) {
       const dia = evento.date_start.getDate();
       contenido += `<h2>${evento.title}</h2>`;
+      contenido+= `<span>Artista: </span><h3>${evento.subtitle}</h3>`
       contenido += `<p>Data: día <strong>${dia}</strong></p>`;
       contenido += `<p>Lugar:<strong> ${evento.site}</strong></p>`;
+      contenido += `<p>Máis detalles <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> aquí</a>  </p>`
       contenido += `<p></p>`;
     }
-    contenido += `<p>Máis detalles <a href="https://rock-the-barrio-front-one.vercel.app/"> aquí</a>  </p>`;
+    ;
     const mensaje = {
       from: "rockthebarrio@gmail.com",
       to: destinatario.email,
@@ -80,7 +82,7 @@ const enviarCorreoElectronico = async (destinatario, evento) => {
       to: destinatario.email,
       subject: "Novo evento musical",
       html: `<p>Ola, ${destinatario.username}! Engadiuse un novo evento musical:<strong> ${evento.title}</strong> o día <strong>${dia}</strong> de<strong> ${nombreMes}</strong>.</p>
-        <p>Máis información  <a href="https://rock-the-barrio-front-one.vercel.app"> aquí.</a></p>`,
+        <p>Máis información  <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> aquí.</a></p>`,
     };
 
     const respuesta = await transporter.sendMail(mensaje);
