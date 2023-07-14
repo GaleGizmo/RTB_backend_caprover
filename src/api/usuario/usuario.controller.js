@@ -174,6 +174,7 @@ const forgotPassword = async (req, res) => {
     res
       .status(200)
       .json({
+        token,
         message:
           "Se ha enviado un correo electrónico de recuperación de contraseña",
       });
