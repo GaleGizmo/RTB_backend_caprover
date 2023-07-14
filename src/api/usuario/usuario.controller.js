@@ -3,6 +3,7 @@ const { generateSign, generateTempToken } = require("../../utils/jwt");
 const bcrypt = require("bcrypt");
 const Usuario = require("./usuario.model");
 const { deleteImg } = require("../../middleware/deleteImg");
+const { enviarCorreoRecuperacion } = require("../../utils/email");
 
 const login = async (req, res, next) => {
   try {
@@ -157,7 +158,7 @@ const deleteUsuario = async (req, res, next) => {
     return next(error);
   }
 };
-const forgotPassword = async (req, res, next) => {
+const forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
     const user = await Usuario.findOne({ email });
@@ -165,10 +166,11 @@ const forgotPassword = async (req, res, next) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
     const token = generateTempToken(user._id);
+    console.log(token, user);
     user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + 3600000; // Token válido por 1 hora
     await user.save();
-    await enviarCorreoRecuperacion(user, token);
+    await enviarCorreoRecuperacion (user, token);
     res
       .status(200)
       .json({
@@ -187,4 +189,27 @@ const forgotPassword = async (req, res, next) => {
       });
   }
 };
-module.exports = { login, createUsuario, editUsuario, forgotPassword, deleteUsuario };
+const resetPassword = async (req, res, next) => {
+  const { token, password } = req.body;
+
+  try {
+    // Buscar al usuario por el token de recuperación de contraseña
+    const user = await Usuario.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } });
+    if (!user) {
+      return res.status(400).json({ message: 'Token inválido o expirado' });
+    }
+
+    // Actualizar la contraseña del usuario
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    await user.save();
+
+    res.status(200).json({ message: 'Contraseña restablecida exitosamente' });
+  } catch (error) {
+    console.error('Error al restablecer la contraseña:', error);
+    res.status(500).json({ message: 'Error al restablecer la contraseña' });
+  }
+};
+module.exports = { login, createUsuario, editUsuario, forgotPassword, deleteUsuario, resetPassword };

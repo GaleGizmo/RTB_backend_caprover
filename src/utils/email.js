@@ -98,10 +98,11 @@ const enviarCorreoRecuperacion = async (destinatario, token) => {
       to: destinatario.email,
       subject: "Recuperación de contrasinal",
       html: `<p>Ola, ${destinatario.username},</p>
-             <p>Solicitaches restablecer o teu contrasinal na nosa aplicación.</p>
-             <p>Clica no seguinte enlace para cambia-lo teu  contrasinal:</p>
+             <p>Semella que solicitaches restablecer o teu contrasinal na nosa aplicación.</p>
+             <p>Clica no seguinte enlace para cambia-lo teu contrasinal:</p>
              <a href="https://rock-the-barrio-front-one.vercel.app/reset-password/${token}">Restablecer contrasinal</a>
-             <p>Se non solicitaches restablece-lo teu contrasinal, ignora este correo.</p>
+             <span>(Este enlace caduca en 60 minutos)</span>
+             <p>Se non solicitaches restablece-lo teu contrasinal, borra por favor este correo.</p>
              <p>Grazas,</p>
              <p>Rock The Barrio</p></p>`,
     };
