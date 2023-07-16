@@ -93,7 +93,7 @@ const editUsuario = async (req, res, next) => {
   try {
     const { idUsuario } = req.params;
 
-    const { email, password, username, newsletter, newevent, avatar } =
+    const {  email, password, username, newsletter, newevent, avatar } =
       req.body;
 
     // Busca al usuario por su ID
@@ -102,28 +102,25 @@ const editUsuario = async (req, res, next) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
     const existingEmailUser = await Usuario.findOne({ email: email });
-    if (existingEmailUser) {
+    if (existingEmailUser && existingEmailUser._id!=idUsuario) {
       return res.status(400).json({ message: "Este email ya está en uso" });
     }
     const existingUsernameUser = await Usuario.findOne({
       username: username,
     });
-    if (existingUsernameUser) {
+    if (existingUsernameUser && existingUsernameUser._id!=idUsuario) {
       return res
         .status(400)
         .json({ message: "Nombre de usuario no disponible" });
     }
     // Actualiza los datos del usuario si es procedente
 
-    if (email) userToUpdate.email = email;
-    if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      userToUpdate.password = hashedPassword;
-    }
+    userToUpdate.email = email;
+    
 
-    if (username) userToUpdate.username = username;
-    if (newsletter) userToUpdate.newsletter = newsletter;
-    if (newevent) userToUpdate.newevent = newevent;
+    userToUpdate.username = username;
+    userToUpdate.newsletter = newsletter;
+    userToUpdate.newevent = newevent;
     if (req.file) {
       const oldUsuario = await Usuario.findById(idUsuario);
       if (oldUsuario.avatar) {
