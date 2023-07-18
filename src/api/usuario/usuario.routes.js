@@ -7,7 +7,7 @@ const { createUsuario, deleteUsuario, login, editUsuario, forgotPassword, resetP
 usuarioRoutes.post('/register', upload.single("avatar"),createUsuario);
 usuarioRoutes.post('/login', login);
 usuarioRoutes.put('/:idUsuario',[isAdminOrOwner], upload.single("avatar"), editUsuario);
-usuarioRoutes.put('/reset-password/unsubscribe', unsubscribe)
+usuarioRoutes.put('/reset-password/unsubscribe/:idUsuario',[isAdminOrOwner], unsubscribe)
 usuarioRoutes.delete('/:idUsuario',[isAdminOrOwner], deleteUsuario);
 usuarioRoutes.post('/recuperar-password', forgotPassword)
 usuarioRoutes.post('/reset-password', resetPassword)
