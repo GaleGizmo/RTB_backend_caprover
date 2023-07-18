@@ -93,7 +93,7 @@ const editUsuario = async (req, res, next) => {
   try {
     const { idUsuario } = req.params;
 
-    const {  email, password, username, newsletter, newevent, avatar } =
+    const { email, password, username, newsletter, newevent, avatar } =
       req.body;
 
     // Busca al usuario por su ID
@@ -102,13 +102,13 @@ const editUsuario = async (req, res, next) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
     const existingEmailUser = await Usuario.findOne({ email: email });
-    if (existingEmailUser && existingEmailUser._id!=idUsuario) {
+    if (existingEmailUser && existingEmailUser._id != idUsuario) {
       return res.status(400).json({ message: "Este email ya está en uso" });
     }
     const existingUsernameUser = await Usuario.findOne({
       username: username,
     });
-    if (existingUsernameUser && existingUsernameUser._id!=idUsuario) {
+    if (existingUsernameUser && existingUsernameUser._id != idUsuario) {
       return res
         .status(400)
         .json({ message: "Nombre de usuario no disponible" });
@@ -116,7 +116,6 @@ const editUsuario = async (req, res, next) => {
     // Actualiza los datos del usuario si es procedente
 
     userToUpdate.email = email;
-    
 
     userToUpdate.username = username;
     userToUpdate.newsletter = newsletter;
@@ -167,24 +166,20 @@ const forgotPassword = async (req, res) => {
     user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + 3600000; // Token válido por 1 hora
     await user.save();
-    await enviarCorreoRecuperacion (user, token);
-    res
-      .status(200)
-      .json({
-        token,
-        message:
-          "Se ha enviado un correo electrónico de recuperación de contraseña",
-      });
+    await enviarCorreoRecuperacion(user, token);
+    res.status(200).json({
+      token,
+      message:
+        "Se ha enviado un correo electrónico de recuperación de contraseña",
+    });
   } catch (error) {
     console.error(
       "Error al procesar la solicitud de recuperación de contraseña:",
       error
     );
-    res
-      .status(500)
-      .json({
-        message: "Error al procesar la solicitud de recuperación de contraseña",
-      });
+    res.status(500).json({
+      message: "Error al procesar la solicitud de recuperación de contraseña",
+    });
   }
 };
 const resetPassword = async (req, res, next) => {
@@ -192,9 +187,12 @@ const resetPassword = async (req, res, next) => {
 
   try {
     // Buscar al usuario por el token de recuperación de contraseña
-    const user = await Usuario.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } });
+    const user = await Usuario.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
     if (!user) {
-      return res.status(400).json({ message: 'Token inválido o expirado' });
+      return res.status(400).json({ message: "Token inválido o expirado" });
     }
 
     // Actualizar la contraseña del usuario
@@ -204,10 +202,39 @@ const resetPassword = async (req, res, next) => {
     user.resetPasswordExpires = null;
     await user.save();
 
-    res.status(200).json({ message: 'Contraseña restablecida exitosamente' });
+    res.status(200).json({ message: "Contraseña restablecida exitosamente" });
   } catch (error) {
-    console.error('Error al restablecer la contraseña:', error);
-    res.status(500).json({ message: 'Error al restablecer la contraseña' });
+    console.error("Error al restablecer la contraseña:", error);
+    res.status(500).json({ message: "Error al restablecer la contraseña" });
   }
 };
-module.exports = { login, createUsuario, editUsuario, forgotPassword, deleteUsuario, resetPassword };
+const unsubscribe = async (req, res, next) => {
+  const { email, unsubscribe } = req.body;
+
+  try {
+    const user = await Usuario.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+    if (unsubscribe === "unsubscribenewsletter") {
+      user.newsletter = false;
+    }
+    if (unsubscribe === "unsubscribenewevent") {
+      user.newevent = false;
+    }
+    await user.save();
+    res.status(200).json({ user, message: "Ajustes de suscripción cambiados" });
+  } catch (error) {
+    console.error("Error al cancelar la suscripción:", error);
+    res.status(500).json({ message: "Error al restablecer la contraseña" });
+  }
+};
+module.exports = {
+  login,
+  createUsuario,
+  editUsuario,
+  forgotPassword,
+  deleteUsuario,
+  resetPassword,
+  unsubscribe,
+};

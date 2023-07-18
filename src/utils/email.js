@@ -35,13 +35,14 @@ const enviarCorreoSemanal = async (destinatario, eventos) => {
     for (const evento of eventos) {
       const dia = evento.date_start.getDate();
       contenido += `<h2>${evento.title}</h2>`;
-      contenido+= `<span>Artista: </span><h3>${evento.subtitle}</h3>`
+      contenido += `<span>Artista: </span><h3>${evento.subtitle}</h3>`;
       contenido += `<p>Data: día <strong>${dia}</strong></p>`;
       contenido += `<p>Lugar:<strong> ${evento.site}</strong></p>`;
-      contenido += `<p>Máis detalles <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> aquí</a>  </p>`
+      contenido += `<p>Máis detalles <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> aquí</a>  </p>`;
+      contenido += `<p></p>`;
       contenido += `<p></p>`;
     }
-    ;
+    contenido += `<p></p> <p>Para deixar de recibir este correo semanal preme <a href="https://rock-the-barrio-front-one.vercel.app/reset-password/unsubscribenewsletter">aquí</a></p>`;
     const mensaje = {
       from: "rockthebarrio@gmail.com",
       to: destinatario.email,
@@ -81,8 +82,8 @@ const enviarCorreoElectronico = async (destinatario, evento) => {
       from: "rockthebarrio@gmail.com",
       to: destinatario.email,
       subject: "Novo evento musical",
-      html: `<p>Ola, ${destinatario.username}! Engadiuse un novo evento musical:<strong> ${evento.title}</strong> o día <strong>${dia}</strong> de<strong> ${nombreMes}</strong>.</p>
-        <p>Máis información  <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> aquí.</a></p>`,
+      html: `<p>Ola, ${destinatario.username}!</p><p></p> <p>Engadiuse un novo evento musical:<strong> ${evento.title}</strong> o día <strong>${dia}</strong> de<strong> ${nombreMes}</strong>.</p>
+        <p>Máis detalles  <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> aquí.</a></p> <p></p> <p>Para deixar de recibir estes correos preme<a href="https://rock-the-barrio-front-one.vercel.app/reset-password/unsubscribenewevent">aquí</a></p>`,
     };
 
     const respuesta = await transporter.sendMail(mensaje);
@@ -115,4 +116,8 @@ const enviarCorreoRecuperacion = async (destinatario, token) => {
     console.error("Error al enviar el correo electrónico:", error);
   }
 };
-module.exports = { enviarCorreoElectronico, enviarCorreoSemanal, enviarCorreoRecuperacion };
+module.exports = {
+  enviarCorreoElectronico,
+  enviarCorreoSemanal,
+  enviarCorreoRecuperacion,
+};
