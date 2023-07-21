@@ -43,6 +43,8 @@ const enviarCorreoSemanal = async (destinatario, eventos) => {
       contenido += `<p></p>`;
     }
     contenido += `<p></p> <p>Para deixar de recibir este correo semanal preme <a href="https://rock-the-barrio-front-one.vercel.app/reset-password/unsubscribenewsletter"> aquí</a>.</p>`;
+    contenido += `<p>Podes ver aquí os <a href="https://rock-the-barrio-front-one.vercel.app/terminos"> Termos e Condicións </a> e a nosa <a href="https://rock-the-barrio-front-one.vercel.app/privacidad"> Política de Privacidade</a>.</p>`;
+
     const mensaje = {
       from: "rockthebarrio@gmail.com",
       to: destinatario.email,
@@ -83,7 +85,7 @@ const enviarCorreoElectronico = async (destinatario, evento) => {
       to: destinatario.email,
       subject: "Novo evento musical",
       html: `<p>Ola, ${destinatario.username}!</p><p></p> <p>Engadiuse un novo evento musical:<strong> ${evento.title}</strong> o día <strong>${dia}</strong> de<strong> ${nombreMes}</strong>.</p>
-        <p>Máis detalles  <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> aquí.</a></p> <p></p> <p>Para deixar de recibir estes correos preme <a href="https://rock-the-barrio-front-one.vercel.app/reset-password/unsubscribenewevent"> aquí</a>.</p>`,
+        <p>Máis detalles  <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> aquí.</a></p> <p></p> <p>Para deixar de recibir estes correos preme <a href="https://rock-the-barrio-front-one.vercel.app/reset-password/unsubscribenewevent"> aquí</a>.</p><p>Podes ver aquí os <a href="https://rock-the-barrio-front-one.vercel.app/terminos"> Termos e Condicións </a> e a nosa <a href="https://rock-the-barrio-front-one.vercel.app/privacidad"> Política de Privacidade</a>.</p>`,
     };
 
     const respuesta = await transporter.sendMail(mensaje);
