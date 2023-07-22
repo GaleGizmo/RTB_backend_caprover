@@ -10,6 +10,7 @@ const EventoSchema = new mongoose.Schema(
     price: { type: Number,  required: true  },
     date_start: { type: Date, required: true },
     date_end: { type: Date},
+    buy_ticket: {type: String},
     url: { type: String },
     image: { type: String },
     genre: { type: String }
