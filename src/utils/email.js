@@ -51,7 +51,7 @@ const enviarCorreoSemanal = async (destinatario, eventos) => {
     }
 
     const contenido = `
-     <div style="display: -webkit-flex; display: -ms-flexbox; display: flex; flex-direction:column; justify-content: center; align-items:center"> <p>Ola, ${destinatario.username}!</p>
+     <div style="display: block; width: 100%; text-align:center;"> <p>Ola, ${destinatario.username}!</p>
       <h1><u>EVENTOS SEMANAIS</u></h1>
       ${eventosHTML}
       <p></p>
