@@ -13,6 +13,7 @@ const EventoSchema = new mongoose.Schema(
     buy_ticket: {type: String},
     url: { type: String },
     image: { type: String },
+    youtubeVideoId: {type: String},
     genre: { type: String }
   },
   {

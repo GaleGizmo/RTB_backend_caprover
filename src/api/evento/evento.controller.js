@@ -73,6 +73,7 @@ const setEvento = async (req, res, next) => {
       date_end,
       url,
       image,
+      youtubeVideoId,
       genre,
     } = req.body;
 
@@ -89,6 +90,7 @@ const setEvento = async (req, res, next) => {
       date_end,
       url,
       image,
+      youtubeVideoId,
       genre,
       timestamp,
     });
