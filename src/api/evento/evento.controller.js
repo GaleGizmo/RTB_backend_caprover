@@ -42,7 +42,7 @@ const sendEventosSemanales = async (req, res, next) => {
     for (const usuario of usuarios) {
       await enviarCorreoSemanal(usuario, eventosSemana);
     }
- return res.json("eventos enviados")
+    return res.status(200).json({ message: "Eventos enviados con éxito" });
   } catch (error) {
     console.error("Error al obtener eventos semanales:", error);
   }

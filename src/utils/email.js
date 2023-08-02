@@ -93,13 +93,20 @@ const enviarCorreoElectronico = async (destinatario, evento) => {
     ];
 
     const nombreMes = mesesEnGallego[mes];
+    let contenidoEmail=""
+    if (evento.title===evento.subtitle){
+      contenidoEmail=`<p>Ola, ${destinatario.username}!</p><p></p> <p>Engadiuse un novo evento musical: <h2><strong> ${evento.title}</strong></h2> o día <strong>${dia}</strong> de<strong> ${nombreMes}</strong>.</p>
+      <p>Máis detalles  <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> aquí.</a></p> <p></p> <p>Para deixar de recibir estes correos preme <a href="https://rock-the-barrio-front-one.vercel.app/reset-password/unsubscribenewevent"> aquí</a>.</p><p>Podes ver aquí os <a href="https://rock-the-barrio-front-one.vercel.app/terminos"> Termos e Condicións </a> e a nosa <a href="https://rock-the-barrio-front-one.vercel.app/privacidad"> Política de Privacidade</a>.</p>`
+    } else {
+      contenidoEmail=`<p>Ola, ${destinatario.username}!</p><p></p> <p>Engadiuse un novo evento musical: <h2><strong> ${evento.title}</strong></h2> con <h3><strong> ${evento.subtitle}</strong></h3> o día <strong>${dia}</strong> de<strong> ${nombreMes}</strong>.</p>
+      <p>Máis detalles  <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> aquí.</a></p> <p></p> <p>Para deixar de recibir estes correos preme <a href="https://rock-the-barrio-front-one.vercel.app/reset-password/unsubscribenewevent"> aquí</a>.</p><p>Podes ver aquí os <a href="https://rock-the-barrio-front-one.vercel.app/terminos"> Termos e Condicións </a> e a nosa <a href="https://rock-the-barrio-front-one.vercel.app/privacidad"> Política de Privacidade</a>.</p>`
+    }
 
     const mensaje = {
       from: "rockthebarrio@gmail.com",
       to: destinatario.email,
       subject: "Novo evento musical",
-      html: `<p>Ola, ${destinatario.username}!</p><p></p> <p>Engadiuse un novo evento musical:<strong> ${evento.title}</strong> o día <strong>${dia}</strong> de<strong> ${nombreMes}</strong>.</p>
-        <p>Máis detalles  <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> aquí.</a></p> <p></p> <p>Para deixar de recibir estes correos preme <a href="https://rock-the-barrio-front-one.vercel.app/reset-password/unsubscribenewevent"> aquí</a>.</p><p>Podes ver aquí os <a href="https://rock-the-barrio-front-one.vercel.app/terminos"> Termos e Condicións </a> e a nosa <a href="https://rock-the-barrio-front-one.vercel.app/privacidad"> Política de Privacidade</a>.</p>`,
+      html: contenidoEmail ,
     };
 
     const respuesta = await transporter.sendMail(mensaje);
