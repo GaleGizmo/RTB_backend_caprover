@@ -12,7 +12,10 @@ const usuarioSchema = mongoose.Schema(
     avatar: { type: String, required: false, unique: false },
     newsletter: { type: Boolean, required: false, default: false },
     newevent: { type: Boolean, required: false, default: false },
+    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Evento" }],
+    favoritesAlert: {type: Boolean, required: false, default: true }, 
   },
+  
   {
     timestamps: true,
     collection: "usuario",

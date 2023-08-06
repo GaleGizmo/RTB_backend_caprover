@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const Usuario = require("./usuario.model");
 const { deleteImg } = require("../../middleware/deleteImg");
 const { enviarCorreoRecuperacion } = require("../../utils/email");
+const Evento = require("../evento/evento.model");
 
 const login = async (req, res, next) => {
   try {
@@ -35,7 +36,7 @@ const login = async (req, res, next) => {
 
 const createUsuario = async (req, res, next) => {
   try {
-    console.log(req.body);
+    
 
     // Verifica si ya existe un usuario con el mismo email o username
     if (!req.body.email) {
@@ -229,6 +230,34 @@ const unsubscribe = async (req, res, next) => {
     res.status(500).json({ message: "Error al restablecer la contraseña" });
   }
 };
+
+const addFavorite=async(req, res, next)=>{
+  const {userId, eventId, add}=req.body
+  try {
+    const usuario = await Usuario.findById(userId);
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+    const evento = await Evento.findById(eventId);
+    if (!evento) {
+      return res.status(404).json({ message: "Evento no encontrado" });
+    }
+    if (add) {usuario.favorites.push(eventId);}
+    else {usuario.favorites.pull(eventId);}
+    
+    await usuario.save();
+    
+
+    res.json({
+      message: add ? " Evento añadido correctamente": "Evento eliminado correctamente", 
+      
+    });
+  } catch (error) {
+    
+    res.status(500).json({ message: "Error al modificar favoritos" });
+  }
+
+}
 module.exports = {
   login,
   createUsuario,
@@ -237,4 +266,5 @@ module.exports = {
   deleteUsuario,
   resetPassword,
   unsubscribe,
+  addFavorite
 };

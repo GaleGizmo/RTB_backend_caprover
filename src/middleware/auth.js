@@ -7,17 +7,19 @@ const isAuth = async (req, res, next) => {
     const token = req.headers.authorization;
 
     if (!token) {
-      return res.json("No estás autorizado chaval");
+      return res.status(401).json({ error: "Debes estar logueado, chaval" });
     }
     const parsedToken = token.replace("Bearer ", "");
 
     const validToken = verifyJwt(parsedToken);
-    const userLogued = await User.findById(validToken.id);
-    userLogued.password = null;
+    const userLogued = await User.findById(validToken.id).select("-password");
+    if (!userLogued) {
+      return res.status(401).json({ error: "Usuario no encontrado" });
+    }
     req.user = userLogued;
     next();
   } catch (error) {
-    return res.json();
+    return res.status(500).json({ error: "Error en el servidor" });
   }
 };
 
@@ -26,7 +28,7 @@ const isAdmin = async (req, res, next) => {
     const token = req.headers.authorization;
 
     if (!token) {
-      return res.json("No estás autorizado chaval");
+      return res.status(401).json({ error: "Debes estar logueado, chaval" });
     }
     const parsedToken = token.replace("Bearer ", "");
 
@@ -37,9 +39,9 @@ const isAdmin = async (req, res, next) => {
       userLogued.password = null;
       req.user = userLogued;
       next();
-    } else return res.json("No estás autorizado para esta función, chavalote");
+    } else return res.status(403).json({error: "No estás autorizado para esta función, chavalote"});
   } catch (error) {
-    return res.json();
+    return res.status(500).json({ error: "Error en el servidor" });
   }
 };
 
@@ -48,7 +50,7 @@ const isAdminOrOwner = async (req, res, next) => {
     const token = req.headers.authorization;
 
     if (!token) {
-      return res.json("No estás autorizado, chaval");
+      return res.status(401).json({ error: "Debes estar logueado, chaval" });
     }
 
     const parsedToken = token.replace("Bearer ", "");
@@ -67,7 +69,7 @@ const isAdminOrOwner = async (req, res, next) => {
         .json("No estás autorizado para esta función, chavalote");
     }
   } catch (error) {
-    return res.json();
+    return res.status(500).json({ error: "Error en el servidor" });
   }
 };
 
@@ -76,7 +78,7 @@ const isAdminOrComentarioOwner = async (req, res, next) => {
     const token = req.headers.authorization;
 
     if (!token) {
-      return res.status(403).json("No estás autorizado, chaval");
+      return res.status(401).json({ error: "Debes estar logueado, chaval" });
     }
 
     const parsedToken = token.replace("Bearer ", "");
@@ -99,7 +101,7 @@ const isAdminOrComentarioOwner = async (req, res, next) => {
         .json("No estás autorizado para esta función, chavalote");
     }
   } catch (error) {
-    return res.json();
+    return res.status(500).json({ error: "Error en el servidor" });
   }
 };
 module.exports = { isAuth, isAdmin, isAdminOrOwner, isAdminOrComentarioOwner };
