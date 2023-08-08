@@ -1,6 +1,11 @@
 const { checkMandatoryFields } = require("../../middleware/checkfields");
 const { deleteImg } = require("../../middleware/deleteImg");
-const {enviarCorreoElectronico, enviarCorreoSemanal} = require("../../utils/email");
+const {
+  enviarCorreoElectronico,
+  enviarCorreoSemanal,
+
+  enviarReminderEventos,
+} = require("../../utils/email");
 
 const User = require("../usuario/usuario.model");
 const Evento = require("./evento.model");
@@ -16,20 +21,70 @@ const getAllEventos = async (req, res, next) => {
   }
 };
 
+const getEventosProximos = async () => {
+  const fechaActual = new Date();
+  const fechaTresDias = new Date();
+  const fechaManana = new Date();
+  
+  fechaTresDias.setDate(fechaActual.getDate() + 4);
+  fechaTresDias.setHours(0, 0, 0, 0);
+  
+  fechaManana.setDate(fechaActual.getDate() + 1);
+  fechaManana.setHours(0, 0, 0, 0);
+
+  const eventosProximos = await Evento.find({
+    $or: [
+      { date_start: { $gte: fechaManana, $lt: new Date(fechaManana.getTime() + 24 * 60 * 60 * 1000) } }, // Eventos que ocurran mañana (día 9)
+      { date_start: { $gte: fechaTresDias, $lt: new Date(fechaTresDias.getTime() + 24 * 60 * 60 * 1000) } },  // Eventos que ocurran el día 11
+    ],
+  });
+  return eventosProximos;
+};
+
+const getUsuariosConEventoFavorito = async (eventoId) => {
+  const usuariosConEventoFavorito = await User.find({
+    favorites: eventoId,
+  });
+
+  return usuariosConEventoFavorito;
+};
+//manda recordatorio de eventos favoritos
+const remindEvento = async () => {
+  try {
+    const eventosProximos = await getEventosProximos();
+    if (eventosProximos.length > 0) {
+      for (const evento of eventosProximos) {
+        const usuariosConEventoEnFavoritos = await getUsuariosConEventoFavorito(
+          evento._id
+        );
+        if (usuariosConEventoEnFavoritos.length > 0) {
+          for (const usuario of usuariosConEventoEnFavoritos) {
+            await enviarReminderEventos(evento, usuario);
+          }
+        }
+      }
+      console.log("Recordatorios de eventos enviados con éxito");
+    } else {
+      console.log("No hay eventos próximos");
+    }
+  } catch (error) {
+    console.error("Error al enviar los recordatorios de eventos:", error);
+  }
+};
 //manda por mail eventos de la semana
 const sendEventosSemanales = async (req, res, next) => {
   const hoy = new Date();
-  
+
   //obtenemos la fecha de inicio de la semana y de fin de la semana
   const fechaInicioSemana = new Date(
     hoy.getFullYear(),
     hoy.getMonth(),
-    hoy.getDate() 
+    hoy.getDate()
   );
   const fechaFinSemana = new Date(
     hoy.getFullYear(),
     hoy.getMonth(),
-    hoy.getDate() + (6 )
+    hoy.getDate() + 6
   );
 
   try {
@@ -192,4 +247,5 @@ module.exports = {
   setEvento,
   updateEvento,
   deleteEvento,
+  remindEvento,
 };

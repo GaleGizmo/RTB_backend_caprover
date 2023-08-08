@@ -4,6 +4,7 @@ const { google } = require("googleapis");
 
 
 
+
 const createTransporter = async () => {
   const oAuth2Client = new google.auth.OAuth2(
     process.env.CLIENT_ID,
@@ -116,6 +117,36 @@ const enviarCorreoElectronico = async (destinatario, evento) => {
     throw new Error("No se pudo enviar el correo electrónico.");
   }
 };
+
+const enviarReminderEventos= async (evento, usuario) =>{
+  try {
+    const transporter = await createTransporter();
+    const dia = evento.date_start.getDate();
+    const mensaje = {
+      from: "rockthebarrio@gmail.com",
+      to: usuario.email,
+      subject: "Recordatorio de evento",
+      html: `<div style="display: block; width: 100%; text-align:center;">
+      <p>Ola, ${usuario.username},</p>
+             <p>Un evento que tes engadido en favoritos está próximo a se celebrar:</p>
+             <div style="font-family: Arial, sans-serif; margin: 10px auto ; width:70%;  border: 2px solid #000; border-radius: 10px; padding: 10px 20px; background-image:linear-gradient(to bottom, #f16704, #fff);  ">
+        <h2>${evento.title}</h2>
+        <span>Artista: </span><h3 style="display: inline;">${evento.subtitle}</h3>
+        <p>Data: día <strong>${dia}</strong></p>
+        <p>Lugar:<strong> ${evento.site}</strong></p>
+        <p>Máis detalles <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> aquí</a></p>
+        </div>
+        <br/>
+        </div>`,
+    };
+
+    const respuesta = await transporter.sendMail(mensaje);
+    console.log("Correo electrónico enviado:", respuesta);
+  } catch (error){
+    console.error("Error al enviar el correo electrónico:", error);
+  }
+};
+
 const enviarCorreoRecuperacion = async (destinatario, token) => {
   try {
     const transporter = await createTransporter();
@@ -144,4 +175,5 @@ module.exports = {
   enviarCorreoElectronico,
   enviarCorreoSemanal,
   enviarCorreoRecuperacion,
+  enviarReminderEventos,
 };
