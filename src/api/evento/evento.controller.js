@@ -25,17 +25,27 @@ const getEventosProximos = async () => {
   const fechaActual = new Date();
   const fechaTresDias = new Date();
   const fechaManana = new Date();
-  
+
   fechaTresDias.setDate(fechaActual.getDate() + 4);
   fechaTresDias.setHours(0, 0, 0, 0);
-  
+
   fechaManana.setDate(fechaActual.getDate() + 1);
   fechaManana.setHours(0, 0, 0, 0);
 
   const eventosProximos = await Evento.find({
     $or: [
-      { date_start: { $gte: fechaManana, $lt: new Date(fechaManana.getTime() + 24 * 60 * 60 * 1000) } }, // Eventos que ocurran mañana (día 9)
-      { date_start: { $gte: fechaTresDias, $lt: new Date(fechaTresDias.getTime() + 24 * 60 * 60 * 1000) } },  // Eventos que ocurran el día 11
+      {
+        date_start: {
+          $gte: fechaManana,
+          $lt: new Date(fechaManana.getTime() + 24 * 60 * 60 * 1000),
+        },
+      }, // Eventos que ocurran mañana (día 9)
+      {
+        date_start: {
+          $gte: fechaTresDias,
+          $lt: new Date(fechaTresDias.getTime() + 24 * 60 * 60 * 1000),
+        },
+      }, // Eventos que ocurran el día 11
     ],
   });
   return eventosProximos;
@@ -72,34 +82,34 @@ const remindEvento = async () => {
   }
 };
 //manda por mail eventos de la semana
-const sendEventosSemanales = async (req, res, next) => {
-  const hoy = new Date();
-
-  //obtenemos la fecha de inicio de la semana y de fin de la semana
-  const fechaInicioSemana = new Date(
-    hoy.getFullYear(),
-    hoy.getMonth(),
-    hoy.getDate()
-  );
-  const fechaFinSemana = new Date(
-    hoy.getFullYear(),
-    hoy.getMonth(),
-    hoy.getDate() + 6
-  );
-
+const sendEventosSemanales = async () => {
   try {
+    const hoy = new Date();
+
+    //obtenemos la fecha de inicio de la semana y de fin de la semana
+    const fechaInicioSemana = new Date(
+      hoy.getFullYear(),
+      hoy.getMonth(),
+      hoy.getDate()
+    );
+    const fechaFinSemana = new Date(
+      hoy.getFullYear(),
+      hoy.getMonth(),
+      hoy.getDate() + 6
+    );
+      //busca eventos en esa semana
     const eventosSemana = await Evento.find({
       date_start: { $gte: fechaInicioSemana, $lte: fechaFinSemana },
     }).sort({ date_start: 1 });
-
+    //busca usuarios que reciben la newsletter
     const usuarios = await User.find({ newsletter: true }, "email username");
-
+    //envía los correos a los usuarios
     for (const usuario of usuarios) {
       await enviarCorreoSemanal(usuario, eventosSemana);
     }
-    return res.status(200).json({ message: "Eventos enviados con éxito" });
+     console.log({ message: "Eventos enviados con éxito" });
   } catch (error) {
-    console.error("Error al obtener eventos semanales:", error);
+    console.error("Error al enviar eventos semanales:", error);
   }
 };
 // sendEventosSemanales()

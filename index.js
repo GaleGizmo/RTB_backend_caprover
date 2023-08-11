@@ -3,7 +3,7 @@ require("dotenv").config();
 const cors = require("cors");
 const cron = require('node-cron');
 const cloudinary = require("cloudinary").v2;
-const { remindEvento } = require("./src/api/evento/evento.controller.js");
+const { remindEvento, sendEventosSemanales } = require("./src/api/evento/evento.controller.js");
 const PORT = process.env.PORT;
 
 const db = require("./src/utils/db.js");
@@ -15,15 +15,27 @@ cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
+//envío de recordatorio de eventos favoritos cada día a las 10am
 cron.schedule('0 10 * * *', () => {
   remindEvento()
   .then(() => {
-    console.log("Cron job para remindEvento ejecutado con éxito.");
+    console.log("remindEvento ejecutado con éxito.");
   })
   .catch((error) => {
     console.error("Error al ejecutar remindEvento:", error);
   });
 });
+//envío de listado de eventos semanales los lunes a las 10am
+cron.schedule('05 10 * * 1', () => {
+sendEventosSemanales()
+  .then(() => {
+    console.log("sendEventosSemanales ejecutado con éxito.");
+  })
+  .catch((error) => {
+    console.error("Error al ejecutar sendEventosSemanales:", error);
+  });
+})
+
 const express = require("express");
 const eventoRoutes = require("./src/api/evento/evento.routes");
 const usuarioRoutes = require("./src/api/usuario/usuario.routes");
