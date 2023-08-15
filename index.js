@@ -26,7 +26,7 @@ cron.schedule('0 10 * * *', () => {
   });
 });
 //envío de listado de eventos semanales los lunes a las 10am
-cron.schedule('55 19 * * 2', () => {
+cron.schedule('00 20 * * 2', () => {
 sendEventosSemanales()
   .then(() => {
     console.log("sendEventosSemanales ejecutado con éxito.");
