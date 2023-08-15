@@ -163,14 +163,14 @@ const setEvento = async (req, res, next) => {
       newEvento.image = req.file.path;
     }
     await newEvento.save();
-    const usuarios = await User.find(
-      { newevent: true },
-      "email username"
-    ).lean();
+    // const usuarios = await User.find(
+    //   { newevent: true },
+    //   "email username"
+    // ).lean();
 
-    for (const usuario of usuarios) {
-      await enviarCorreoElectronico(usuario, newEvento);
-    }
+    // for (const usuario of usuarios) {
+    //   await enviarCorreoElectronico(usuario, newEvento);
+    // }
 
     return res.status(200).json({ message: "Evento creado con éxito" });
   } catch (error) {
