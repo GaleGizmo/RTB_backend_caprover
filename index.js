@@ -57,13 +57,14 @@ server.use((err, req, res, next) => {
   return res.status(err.status || 500).json(err.message || "Unexpected error");
 });
 
+server.use("/", (req, res) => {
+  res.send("Working");
+});
+
 server.use("*", (req, res, next) => {
   return res.status(404).json("Route not found");
 });
 
-server.use("/", (req, res) => {
-  res.send("Working");
-});
 
 function startServer(port) {
   server.listen(port, function(err) {
