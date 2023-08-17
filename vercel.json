@@ -11,5 +11,15 @@
             "src": "/(.*)",
             "dest": "/"
         }
-    ]
+    ],
+    "crons": [
+        {
+          "path": "/evento/sendEventosSemanales",
+          "schedule": "17 09 * * 4"
+        },
+        {
+          "path": "/evento/remindEvento",
+          "schedule": "0 10 * * *"
+        }
+      ]
 }
