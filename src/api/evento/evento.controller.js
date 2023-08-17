@@ -81,6 +81,14 @@ const remindEvento = async () => {
     console.error("Error al enviar los recordatorios de eventos:", error);
   }
 };
+const remindEventosHandler = async (req, res) => {
+  try {
+    await remindEvento();
+    res.status(200).send({ message: "Recordatorios de eventos enviados con éxito" });
+  } catch (error) {
+    res.status(500).send({ error: "Error al enviar los recordatorios de eventos:" });
+  }
+};
 //manda por mail eventos de la semana
 const sendEventosSemanales = async () => {
   try {
@@ -110,6 +118,14 @@ const sendEventosSemanales = async () => {
      console.log({ message: "Eventos enviados con éxito" });
   } catch (error) {
     console.error("Error al enviar eventos semanales:", error);
+  }
+};
+const sendEventosSemanalesHandler = async (req, res) => {
+  try {
+    await sendEventosSemanales();
+    res.status(200).send({ message: "Eventos enviados con éxito" });
+  } catch (error) {
+    res.status(500).send({ error: "Error al enviar eventos semanales" });
   }
 };
 // sendEventosSemanales()
@@ -258,4 +274,6 @@ module.exports = {
   updateEvento,
   deleteEvento,
   remindEvento,
+  sendEventosSemanalesHandler,
+  remindEventosHandler,
 };
