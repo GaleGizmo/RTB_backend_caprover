@@ -15,7 +15,7 @@
     "crons": [
         {
           "path": "/evento/sendEventosSemanales",
-          "schedule": "00 09 * * *"
+          "schedule": "00 09 * * 1"
         },
         {
           "path": "/evento/remindEvento",

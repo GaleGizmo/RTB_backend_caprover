@@ -61,7 +61,7 @@ const enviarCorreoSemanal = async (destinatario, eventos) => {
       </div>`;
     const mensaje = {
       from: "rockthebarrio@gmail.com",
-      to: "miguelaf71@hotmail.com",
+      to: destinatario.email,
       subject: "Eventos da semana",
       html: contenido,
     };
