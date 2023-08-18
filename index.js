@@ -16,25 +16,25 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 //envío de recordatorio de eventos favoritos cada día a las 10am
-cron.schedule('0 10 * * *', () => {
-  remindEvento()
-  .then(() => {
-    console.log("remindEvento ejecutado con éxito.");
-  })
-  .catch((error) => {
-    console.error("Error al ejecutar remindEvento:", error);
-  });
-});
+// cron.schedule('0 10 * * *', () => {
+//   remindEvento()
+//   .then(() => {
+//     console.log("remindEvento ejecutado con éxito.");
+//   })
+//   .catch((error) => {
+//     console.error("Error al ejecutar remindEvento:", error);
+//   });
+// });
 //envío de listado de eventos semanales los lunes a las 10am
-cron.schedule('45 08 * * 4', () => {
-sendEventosSemanales()
-  .then(() => {
-    console.log("sendEventosSemanales ejecutado con éxito.");
-  })
-  .catch((error) => {
-    console.error("Error al ejecutar sendEventosSemanales:", error);
-  });
-})
+// cron.schedule('45 08 * * 4', () => {
+// sendEventosSemanales()
+//   .then(() => {
+//     console.log("sendEventosSemanales ejecutado con éxito.");
+//   })
+//   .catch((error) => {
+//     console.error("Error al ejecutar sendEventosSemanales:", error);
+//   });
+// })
 
 const express = require("express");
 const eventoRoutes = require("./src/api/evento/evento.routes");
