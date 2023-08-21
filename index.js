@@ -58,7 +58,7 @@ server.use((err, req, res, next) => {
 });
 
 server.use("/", (req, res) => {
-  res.status(400).json("Working");
+  res.status(200).json("Working");
 });
 
 server.use("*", (req, res, next) => {
