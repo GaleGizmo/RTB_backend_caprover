@@ -144,7 +144,7 @@ const setEvento = async (req, res, next) => {
   try {
     const {
       title,
-      subtitle,
+      artist,
       content,
       user_creator,
       site,
@@ -161,7 +161,7 @@ const setEvento = async (req, res, next) => {
     const timestamp = new Date();
     const newEvento = new Evento({
       title,
-      subtitle,
+      artist,
       content,
       user_creator,
       site,
@@ -232,7 +232,7 @@ const deleteEvento = async (req, res, next) => {
 //actualiza un evento de la BBDD
 const updateEvento = async (req, res, next) => {
   try {
-    // if (!req.body.title || !req.body.subtitle  || !req.body.content || !req.body.site || !req.body.date_start){
+    // if (!req.body.title || !req.body.artist  || !req.body.content || !req.body.site || !req.body.date_start){
     //   return res.status(400).json({message: "Faltan campos obligatorios"});
     // }
 

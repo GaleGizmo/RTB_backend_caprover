@@ -6,7 +6,7 @@ const DB_URL = process.env.DB_URL;
 misEventos = [
     {
     title: "Musicales San Fermin 2023",
-    subtitle: "San Fermin 2023",
+    artist: "San Fermin 2023",
     content: "Conciertos de San Fermin 2023, Pamplona Iruña",
     user_creator:"647e129a8ad57f9c059d6218", 
     site: "Pamplona", 

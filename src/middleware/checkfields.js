@@ -1,7 +1,7 @@
 function checkEventMandatoryFields(req, res, next) {
   const requiredFields = [
     "title",
-    "subtitle",
+    "artist",
     "content",
     "user_creator",
     "site",

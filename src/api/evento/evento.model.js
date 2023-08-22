@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const EventoSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
-    subtitle: { type: String, required: true },
+    artist: { type: String, required: true },
     content: { type: String,  required: true },
     user_creator: { type: mongoose.Types.ObjectId, ref:"usuario",  required: true  }, 
     site: { type: String, required: true }, 

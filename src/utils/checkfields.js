@@ -2,7 +2,7 @@
 function checkEventMandatoryFields(body) {
 const requiredFields = [
     "title",
-    "subtitle",
+    "artist",
     "content",
     "user_creator",
     "site",
