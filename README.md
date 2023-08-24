@@ -6,16 +6,20 @@ Backend de la API de Rock The Barrio, programada en Node y atacando a una base d
 
 ### Eventos
 
+
 - Ver lista de eventos: cualquier usuario
 - Ver detalles de eventos: cualquier usuario
 - Crear evento:  admin
 - Editar evento:  admin
 - Borrar evento:  admin
 
+
 Rutas asociadas a eventos Cron:
 - Enviar lista de eventos semanales cada lunes
 - Enviar recordatorio de eventos favoritos próximos
+  
 ### Usuarios
+
 
 - Crear usuario
 - Loguearse
@@ -25,7 +29,9 @@ Rutas asociadas a eventos Cron:
 - Editar datos de usuario:  propietario o admin
 - Editar suscripciones a notificaciones de eventos:  propietario o admin
 
+
 ### Comentarios
+
 
 - Ver comentarios: cualquier usuario
 - Añadir comentario/valoración: usuario logueado
