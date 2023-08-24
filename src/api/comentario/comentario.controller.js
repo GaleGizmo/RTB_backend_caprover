@@ -12,7 +12,10 @@ const getAllComentarios = async (req, res, next) => {
 const getComentariosByUser = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const comentarios = await Comentario.findOne({ user: userId });
+    const comentarios = await Comentario.find({ user: userId }).sort({createdAt: -1});
+    if (!comentarios || comentarios.length === 0) {
+      return res.status(404).json({ message: "No se encontraron comentarios para este usuario." });
+    }
     return res.status(200).json(comentarios);
   } catch (error) {
     return next(error);

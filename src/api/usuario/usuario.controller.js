@@ -1,10 +1,11 @@
 const { generateSign, generateTempToken } = require("../../utils/jwt");
-
+const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const Usuario = require("./usuario.model");
 const { deleteImg } = require("../../middleware/deleteImg");
 const { enviarCorreoRecuperacion } = require("../../utils/email");
 const Evento = require("../evento/evento.model");
+const Comentario = require("../comentario/comentario.model")
 
 const login = async (req, res, next) => {
   try {
@@ -140,21 +141,38 @@ const editUsuario = async (req, res, next) => {
 };
 
 const deleteUsuario = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  
   try {
     const { idUsuario } = req.params;
-    const usuarioToDelete = await Usuario.findByIdAndDelete(idUsuario);
+    
+    // Eliminar comentarios del usuario
+    await Comentario.deleteMany({ user: idUsuario }, { session });
+
+    // Eliminar usuario
+    const usuarioToDelete = await Usuario.findByIdAndDelete(idUsuario, { session });
+    
     if (!usuarioToDelete) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(404).json({ message: "Usuario no encontrado" });
     } else {
       if (usuarioToDelete.avatar) {
         deleteImg(usuarioToDelete.avatar);
       }
+
+      await session.commitTransaction();
+      session.endSession();
       return res.status(200).json(usuarioToDelete);
     }
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     return next(error);
   }
 };
+
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
