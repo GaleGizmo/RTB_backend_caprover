@@ -39,41 +39,45 @@ const getEventosProximos = async () => {
           $gte: fechaManana,
           $lt: new Date(fechaManana.getTime() + 24 * 60 * 60 * 1000),
         },
-      }, // Eventos que ocurran mañana (día 9)
+      }, // Eventos que ocurran mañana 
       {
         date_start: {
           $gte: fechaTresDias,
           $lt: new Date(fechaTresDias.getTime() + 24 * 60 * 60 * 1000),
         },
-      }, // Eventos que ocurran el día 11
+      }, // Eventos que ocurran en tres días
     ],
   });
   return eventosProximos;
 };
 
-const getUsuariosConEventoFavorito = async (eventoId) => {
-  const usuariosConEventoFavorito = await User.find({
-    favorites: eventoId,
-  });
+// const getUsuariosConEventoFavorito = async (eventoId) => {
+//   const usuariosConEventoFavorito = await User.find({
+//     favorites: eventoId,
+//   });
 
-  return usuariosConEventoFavorito;
-};
+//   return usuariosConEventoFavorito;
+// };
 //manda recordatorio de eventos favoritos
 const remindEvento = async () => {
   try {
     const eventosProximos = await getEventosProximos();
+
     if (eventosProximos.length > 0) {
-      for (const evento of eventosProximos) {
-        const usuariosConEventoEnFavoritos = await getUsuariosConEventoFavorito(
-          evento._id
-        );
-        if (usuariosConEventoEnFavoritos.length > 0) {
-          for (const usuario of usuariosConEventoEnFavoritos) {
+      const usuariosConEventoEnFavoritos = await User.find({
+        favorites: { $in: eventosProximos.map(evento => evento._id) }
+      });
+
+      if (usuariosConEventoEnFavoritos.length > 0) {
+        for (const usuario of usuariosConEventoEnFavoritos) {
+          for (const evento of eventosProximos) {
             await enviarReminderEventos(evento, usuario);
           }
         }
+        console.log("Recordatorios de eventos enviados con éxito");
+      } else {
+        console.log("No hay usuarios con eventos en favoritos");
       }
-      console.log("Recordatorios de eventos enviados con éxito");
     } else {
       console.log("No hay eventos próximos");
     }
@@ -81,6 +85,7 @@ const remindEvento = async () => {
     console.error("Error al enviar los recordatorios de eventos:", error);
   }
 };
+
 const remindEventosHandler = async (req, res) => {
   try {
     await remindEvento();
@@ -213,7 +218,7 @@ const deleteEvento = async (req, res, next) => {
         .status(400)
         .json({ message: "Error de validación", error: error.message });
     } else if (error.name === "MongoError" && error.code === 11000) {
-      // Manejo de errores de duplicados (si se tiene un índice único en el modelo)
+      // Manejo de errores de duplicados 
       return res
         .status(400)
         .json({ message: "Error de duplicado", error: error.message });
