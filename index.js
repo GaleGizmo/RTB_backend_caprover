@@ -26,7 +26,7 @@ cloudinary.config({
 //   });
 // });
 //envío de listado de eventos semanales los lunes a las 10am
-// cron.schedule('45 08 * * 4', () => {
+// cron.schedule('45 08 * * 1', () => {
 // sendEventosSemanales()
 //   .then(() => {
 //     console.log("sendEventosSemanales ejecutado con éxito.");

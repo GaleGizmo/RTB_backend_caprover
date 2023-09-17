@@ -1,8 +1,8 @@
 const { checkMandatoryFields } = require("../../middleware/checkfields");
 const { deleteImg } = require("../../middleware/deleteImg");
 const {
-  enviarCorreoElectronico,
-  enviarCorreoSemanal,
+  enviarCorreo,
+  
 
   enviarReminderEventos,
 } = require("../../utils/email");
@@ -39,7 +39,7 @@ const getEventosProximos = async () => {
           $gte: fechaManana,
           $lt: new Date(fechaManana.getTime() + 24 * 60 * 60 * 1000),
         },
-      }, // Eventos que ocurran mañana 
+      }, // Eventos que ocurran mañana
       {
         date_start: {
           $gte: fechaTresDias,
@@ -65,7 +65,7 @@ const remindEvento = async () => {
 
     if (eventosProximos.length > 0) {
       const usuariosConEventoEnFavoritos = await User.find({
-        favorites: { $in: eventosProximos.map(evento => evento._id) }
+        favorites: { $in: eventosProximos.map((evento) => evento._id) },
       });
 
       if (usuariosConEventoEnFavoritos.length > 0) {
@@ -89,40 +89,59 @@ const remindEvento = async () => {
 const remindEventosHandler = async (req, res) => {
   try {
     await remindEvento();
-    res.status(200).send({ message: "Recordatorios de eventos enviados con éxito" });
+    res
+      .status(200)
+      .send({ message: "Recordatorios de eventos enviados con éxito" });
   } catch (error) {
-    res.status(500).send({ error: "Error al enviar los recordatorios de eventos:" });
+    res
+      .status(500)
+      .send({ error: "Error al enviar los recordatorios de eventos:" });
   }
 };
+
+const getEventosAEnviar = async (fechaInicio, fechaFin, field) => {
+  const query = {};
+  query[field] = { $gte: fechaInicio, $lt: fechaFin };
+
+  return await Evento.find(query).sort({ date_start: 1 });
+};
+
+const sendCorreos = async (usuarios, eventos, tipoCorreo) => {
+  
+  await Promise.all(
+    usuarios.map((usuario) => enviarCorreo(usuario, eventos, tipoCorreo))
+  );
+};
+
 //manda por mail eventos de la semana
 const sendEventosSemanales = async () => {
   try {
     const hoy = new Date();
-
+    const semanal = true;
     //obtenemos la fecha de inicio de la semana y de fin de la semana
-    const fechaInicioSemana = new Date(
+    const fechaInicio = new Date(
       hoy.getFullYear(),
       hoy.getMonth(),
       hoy.getDate()
     );
-    const fechaFinSemana = new Date(
+    const fechaFin = new Date(
       hoy.getFullYear(),
       hoy.getMonth(),
       hoy.getDate() + 6
     );
-      //busca eventos en esa semana
-    const eventosSemana = await Evento.find({
-      date_start: { $gte: fechaInicioSemana, $lte: fechaFinSemana },
-    }).sort({ date_start: 1 });
+    //busca eventos en esa semana
+    const eventosSemana = await getEventosAEnviar(
+      fechaInicio,
+      fechaFin,
+      "date_start"
+    );
     //busca usuarios que reciben la newsletter
     const usuarios = await User.find({ newsletter: true }, "email username");
     //envía los correos a los usuarios
-    for (const usuario of usuarios) {
-      await enviarCorreoSemanal(usuario, eventosSemana);
-    }
-     console.log({ message: "Eventos enviados con éxito" });
+    await sendCorreos(usuarios, eventosSemana, semanal);
+    console.log({ message: "Eventos semanales enviados con éxito" });
   } catch (error) {
-    console.error("Error al enviar eventos semanales:", error);
+    console.error("Error al enviar eventos semanales:", error.message);
   }
 };
 const sendEventosSemanalesHandler = async (req, res) => {
@@ -133,7 +152,55 @@ const sendEventosSemanalesHandler = async (req, res) => {
     res.status(500).send({ error: "Error al enviar eventos semanales" });
   }
 };
-// sendEventosSemanales()
+const sendEventosDiarios = async () => {
+  try {
+    const hoy = new Date();
+    const semanal = false;
+    const fechaInicio = new Date(
+      hoy.getFullYear(),
+      hoy.getMonth(),
+      hoy.getDate(),
+      0,
+      0,
+      0
+    );
+    const fechaFin = new Date(
+      hoy.getFullYear(),
+      hoy.getMonth(),
+      hoy.getDate(),
+      14,
+      0,
+      0
+    );
+
+    const eventosDia = await getEventosAEnviar(
+      fechaInicio,
+      fechaFin,
+      "createdAt"
+    );
+    if (eventosDia && eventosDia.length > 0) {
+      const usuarios = await User.find(
+        { newevent: true },
+        "email username"
+      ).lean();
+      await sendCorreos(usuarios, eventosDia, semanal);
+      console.log({ message: "Eventos añadidos hoy enviados con éxito" });
+    } else {
+      console.log({ message: "No se han añadido eventos hoy" });
+    }
+  } catch (error) {
+    console.error("Error al enviar eventos de hoy:", error.message);
+  }
+};
+const sendEventosDiariosHandler = async (req, res) => {
+  try {
+    await sendEventosDiarios();
+    res.status(200).send({ message: "Eventos de hoy enviados con éxito" });
+  } catch (error) {
+    res.status(500).send({ error: "Error al enviar eventos de hoy" });
+  }
+};
+
 //Recogemos un evento por id
 const getEventoById = async (req, res, next) => {
   try {
@@ -184,14 +251,7 @@ const setEvento = async (req, res, next) => {
       newEvento.image = req.file.path;
     }
     await newEvento.save();
-    const usuarios = await User.find(
-      { newevent: true },
-      "email username"
-    ).lean();
-
-    for (const usuario of usuarios) {
-      await enviarCorreoElectronico(usuario, newEvento);
-    }
+   
 
     return res.status(200).json({ message: "Evento creado con éxito" });
   } catch (error) {
@@ -218,7 +278,7 @@ const deleteEvento = async (req, res, next) => {
         .status(400)
         .json({ message: "Error de validación", error: error.message });
     } else if (error.name === "MongoError" && error.code === 11000) {
-      // Manejo de errores de duplicados 
+      // Manejo de errores de duplicados
       return res
         .status(400)
         .json({ message: "Error de duplicado", error: error.message });
@@ -281,4 +341,6 @@ module.exports = {
   remindEvento,
   sendEventosSemanalesHandler,
   remindEventosHandler,
+  sendEventosDiarios,
+  sendEventosDiariosHandler,
 };
