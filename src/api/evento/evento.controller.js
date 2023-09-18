@@ -159,8 +159,8 @@ const sendEventosDiarios = async () => {
     const fechaInicio = new Date(
       hoy.getFullYear(),
       hoy.getMonth(),
-      hoy.getDate(),
-      0,
+      hoy.getDate()-1,
+      14,
       0,
       0
     );
