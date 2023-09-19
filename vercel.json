@@ -20,10 +20,7 @@
         {
           "path": "/evento/remindEvento",
           "schedule": "0 10 * * *"
-        },
-        {
-          "path": "/evento/sendEventosDiarios",
-          "schedule": "00 14 * * 2-7"
         }
+        
       ]
 }
