@@ -23,11 +23,11 @@ const getAllEventos = async (req, res, next) => {
 
 const getEventosProximos = async () => {
   const fechaActual = new Date();
-  const fechaTresDias = new Date();
+  const fechaUnaSemana = new Date();
   const fechaManana = new Date();
 
-  fechaTresDias.setDate(fechaActual.getDate() + 4);
-  fechaTresDias.setHours(0, 0, 0, 0);
+  fechaUnaSemana.setDate(fechaActual.getDate() + 6);
+  fechaUnaSemana.setHours(0, 0, 0, 0);
 
   fechaManana.setDate(fechaActual.getDate() + 1);
   fechaManana.setHours(0, 0, 0, 0);
@@ -42,8 +42,8 @@ const getEventosProximos = async () => {
       }, // Eventos que ocurran mañana
       {
         date_start: {
-          $gte: fechaTresDias,
-          $lt: new Date(fechaTresDias.getTime() + 24 * 60 * 60 * 1000),
+          $gte: fechaUnaSemana,
+          $lt: new Date(fechaUnaSemana.getTime() + 24 * 60 * 60 * 1000),
         },
       }, // Eventos que ocurran en tres días
     ],

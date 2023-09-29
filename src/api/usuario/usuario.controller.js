@@ -128,6 +128,12 @@ const editUsuario = async (req, res, next) => {
         deleteImg(oldUsuario.avatar);
       }
       userToUpdate.avatar = req.file.path;
+    } else {
+      // Si no se proporciona un nuevo avatar, elimina el avatar existente
+      if (userToUpdate.avatar) {
+        deleteImg(userToUpdate.avatar);
+        userToUpdate.avatar = null;
+      }
     }
 
     // Guarda los cambios en la base de datos
