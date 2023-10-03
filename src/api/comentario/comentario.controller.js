@@ -1,3 +1,4 @@
+const Evento = require("../evento/evento.model");
 const Comentario = require("./comentario.model");
 
 const getAllComentarios = async (req, res, next) => {
@@ -50,6 +51,11 @@ const createComentario = async (req, res, next) => {
     });
 
     const comentarioCreado = await nuevoComentario.save();
+    await Evento.findByIdAndUpdate(
+      event, // ID del evento al que pertenece el comentario
+      { $inc: { commentsCount: 1 } }, // Incrementar commentsCount en 1
+      { new: true } // Devolver el evento actualizado
+    );
     return res.status(201).json(comentarioCreado);
   } catch (error) {
     return next(error);
@@ -87,7 +93,7 @@ const deleteComentario = async (req, res, next) => {
   try {
     const { idComentario } = req.params;
     const userId = req.user._id;
-    const deletedComentario = await Comentario.findByIdAndDelete(idComentario);
+    const deletedComentario = await Comentario.findById(idComentario);
 
     if (!deletedComentario) {
       return res.status(404).json({ message: "Comentario no encontrado" });
@@ -97,7 +103,14 @@ const deleteComentario = async (req, res, next) => {
         .status(403)
         .json({ message: "No tienes permiso para esta acción" });
     }
+    await Comentario.findByIdAndDelete(idComentario);
 
+    // Actualizar commentsCount en el evento correspondiente
+    await Evento.findByIdAndUpdate(
+      deletedComentario.event, 
+      { $inc: { commentsCount: -1 } }, 
+      { new: true } 
+    );
     return res.status(200).json(deletedComentario);
   } catch (error) {
     return next(error);

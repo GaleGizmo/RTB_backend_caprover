@@ -15,7 +15,8 @@ const EventoSchema = new mongoose.Schema(
     image: { type: String },
     youtubeVideoId: {type: String},
     genre: { type: String },
-    status: {type: String}
+    status: {type: String},
+    commentsCount: { type: Number, default: 0 }
   },
   {
     timestamps: true,
