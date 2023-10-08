@@ -95,7 +95,7 @@ const editUsuario = async (req, res, next) => {
   try {
     const { idUsuario } = req.params;
 
-    const { email, password, username, newsletter, newevent, avatar } =
+    const { email, username, newsletter, newevent, avatar } =
       req.body;
 
     // Busca al usuario por su ID
@@ -105,12 +105,14 @@ const editUsuario = async (req, res, next) => {
     }
     const existingEmailUser = await Usuario.findOne({ email: email });
     if (existingEmailUser && existingEmailUser._id != idUsuario) {
-      return res.status(400).json({ message: "Este email ya está en uso" });
+      console.error("Este email está en uso")
+      return res.status(400).json({ message: "Este email está en uso" });
     }
     const existingUsernameUser = await Usuario.findOne({
       username: username,
     });
     if (existingUsernameUser && existingUsernameUser._id != idUsuario) {
+      console.error("Este usuario ya está ocupado")
       return res
         .status(400)
         .json({ message: "Nombre de usuario no disponible" });
@@ -129,11 +131,14 @@ const editUsuario = async (req, res, next) => {
       }
       userToUpdate.avatar = req.file.path;
     } else {
+      if ( avatar) {userToUpdate.avatar=avatar
+
+      }
       // Si no se proporciona un nuevo avatar, elimina el avatar existente
-      if (userToUpdate.avatar) {
+     else {if (userToUpdate.avatar) {
         deleteImg(userToUpdate.avatar);
         userToUpdate.avatar = null;
-      }
+      }}
     }
 
     // Guarda los cambios en la base de datos
@@ -235,11 +240,16 @@ const resetPassword = async (req, res, next) => {
 };
 const unsubscribe = async (req, res, next) => {
   const { email, unsubscribe } = req.body;
+  const { idUsuario } = req.params;
 
   try {
     const user = await Usuario.findOne({ email: email });
+   
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+    if (user && user._id.toString()!==idUsuario){
+      return res.status(400).json({ message: "Non estás autorizado" })
     }
     if (unsubscribe === "unsubscribenewsletter") {
       user.newsletter = false;
@@ -251,7 +261,7 @@ const unsubscribe = async (req, res, next) => {
     res.status(200).json({ user, message: "Ajustes de suscripción cambiados" });
   } catch (error) {
     console.error("Error al cancelar la suscripción:", error);
-    res.status(500).json({ message: "Error al restablecer la contraseña" });
+    res.status(500).json({ message: "Error al cambiar la suscripción" });
   }
 };
 

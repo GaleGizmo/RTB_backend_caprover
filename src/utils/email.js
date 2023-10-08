@@ -178,12 +178,12 @@ const enviarCorreoRecuperacion = async (destinatario, token) => {
     const transporter = await createTransporter();
 
     const mensaje = {
-      from: "rockthebarrio@gmail.com",
+      from: ' Rock The Barrio <rockthebarrio@gmail.com>',
       to: destinatario.email,
       subject: "Recuperación de contrasinal",
       html: `<p>Ola, ${destinatario.username},</p>
              <p>Semella que solicitaches restablecer o teu contrasinal na nosa aplicación.</p>
-             <p>Clica no seguinte enlace para cambia-lo teu contrasinal:</p>
+             <p>Clica no seguinte enlace, ou copiao e pégao no teu navegador, para cambia-lo teu contrasinal:</p>
              <a href="https://rock-the-barrio-front-one.vercel.app/reset-password/${token}">Restablecer contrasinal</a>
              <span>(Este enlace caduca en 60 minutos)</span>
              <p>Se non solicitaches restablece-lo teu contrasinal, borra por favor este correo.</p>
