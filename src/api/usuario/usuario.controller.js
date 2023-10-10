@@ -101,7 +101,8 @@ const editUsuario = async (req, res, next) => {
     // Busca al usuario por su ID
     const userToUpdate = await Usuario.findById(idUsuario);
     if (!userToUpdate) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
+      console.log("usuario no existe")
+      return res.status(404).json({ message: "Usuario non encontrado" });
     }
     const existingEmailUser = await Usuario.findOne({ email: email });
     if (existingEmailUser && existingEmailUser._id != idUsuario) {
@@ -147,7 +148,7 @@ const editUsuario = async (req, res, next) => {
     // Responde con el usuario modificado
     return res.status(200).json(updatedUser);
   } catch (error) {
-    return next(error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -167,7 +168,7 @@ const deleteUsuario = async (req, res, next) => {
     if (!usuarioToDelete) {
       await session.abortTransaction();
       session.endSession();
-      return res.status(404).json({ message: "Usuario no encontrado" });
+      return res.status(404).json({ message: "Usuario non encontrado" });
     } else {
       if (usuarioToDelete.avatar) {
         deleteImg(usuarioToDelete.avatar);
