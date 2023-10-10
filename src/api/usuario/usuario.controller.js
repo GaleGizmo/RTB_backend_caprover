@@ -246,19 +246,15 @@ const unsubscribe = async (req, res, next) => {
     const user = await Usuario.findOne({ email: email });
    
     if (!user) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
+      return res.status(404).json({ message: "Usuario non encontrado" });
     }
     if (user && user._id.toString()!==idUsuario){
       return res.status(400).json({ message: "Non estás autorizado" })
     }
-    if (unsubscribe === "unsubscribenewsletter") {
-      user.newsletter = false;
-    }
-    if (unsubscribe === "unsubscribenewevent") {
-      user.newevent = false;
-    }
+    else user[unsubscribe]=false;
+
     await user.save();
-    res.status(200).json({ user, message: "Ajustes de suscripción cambiados" });
+    res.status(200).json({ user, message: "Axustes de suscripción cambiados" });
   } catch (error) {
     console.error("Error al cancelar la suscripción:", error);
     res.status(500).json({ message: "Error al cambiar la suscripción" });
