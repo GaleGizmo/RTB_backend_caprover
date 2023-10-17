@@ -38,10 +38,12 @@ const createComentario = async (req, res, next) => {
   try {
     const { user, event, title, content, value } = req.body;
 
-    if (!user || !event || !title) {
+    if (!user || !event ) {
       return res.status(400).json({ message: "Faltan campos obligatorios" });
     }
-
+    if (!title && !value){
+      return res.status(400).json({message: "Debes cubrir Título ou Valoración"})
+    }
     const nuevoComentario = new Comentario({
       user,
       event,
@@ -74,11 +76,11 @@ const editComentario = async (req, res, next) => {
       return res.status(404).json({ message: "Comentario no encontrado" });
     }
 
-    if (!title) {
-      return res.status(404).json({ message: "Debes poner algo en el título" });
-    } else {
-      comentarioToUpdate.title = title;
-    }
+    if (!title && !value) {
+      return res.status(404).json({ message: "Debes cubrir título ou valoración" });
+    } 
+    if (title)  comentarioToUpdate.title = title;
+    
     if (content) comentarioToUpdate.content = content;
     if (value) comentarioToUpdate.value = value;
 
