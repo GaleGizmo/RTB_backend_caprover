@@ -85,7 +85,7 @@ const enviarCorreo = async (destinatario, eventos, semanal) => {
       <p style="font-size: 10px; color: #555;">Podes ver aquí os <a href="https://rock-the-barrio-front-one.vercel.app/terminos"> Termos e Condicións </a> e a nosa <a href="https://rock-the-barrio-front-one.vercel.app/privacidad"> Política de Privacidade</a>.</p>
       </div>`;
     const mensaje = {
-      from: "rockthebarrio@gmail.com",
+      from: ' Rock The Barrio <rockthebarrio@gmail.com>',
       to: destinatario.email,
       subject: emailSubject,
       html: contenido,
@@ -149,7 +149,7 @@ const enviarReminderEventos = async (evento, usuario) => {
     const dia = evento.date_start.getDate();
     const lugar=evento.site.split(",")[0]
     const mensaje = {
-      from: "rockthebarrio@gmail.com",
+      from: ' Rock The Barrio <rockthebarrio@gmail.com>',
       to: usuario.email,
       subject: "Recordatorio de evento",
       html: `<div style="display: block; width: 100%; text-align:center;">

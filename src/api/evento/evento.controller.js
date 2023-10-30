@@ -45,10 +45,11 @@ const getEventosProximos = async () => {
           $gte: fechaUnaSemana,
           $lt: new Date(fechaUnaSemana.getTime() + 24 * 60 * 60 * 1000),
         },
-      }, // Eventos que ocurran en tres días
+      }, // Eventos que ocurran en una semana
     ],
   });
-  return eventosProximos;
+  const eventosProximosActivos=eventosProximos.filter(evento=>evento.status !=='cancelled')
+  return eventosProximosActivos;
 };
 
 // const getUsuariosConEventoFavorito = async (eventoId) => {
@@ -103,7 +104,9 @@ const getEventosAEnviar = async (fechaInicio, fechaFin, field) => {
   const query = {};
   query[field] = { $gte: fechaInicio, $lt: fechaFin };
 
-  return await Evento.find(query).sort({ date_start: 1 });
+  const eventos= await Evento.find(query).sort({ date_start: 1 });
+  const eventosActivos= eventos.filter(evento=>evento.status !=='cancelled')
+  return eventosActivos
 };
 
 const sendCorreos = async (usuarios, eventos, tipoCorreo) => {
@@ -144,6 +147,7 @@ const sendEventosSemanales = async () => {
     console.error("Error al enviar eventos semanales:", error.message);
   }
 };
+
 const sendEventosSemanalesHandler = async (req, res) => {
   try {
     await sendEventosSemanales();
