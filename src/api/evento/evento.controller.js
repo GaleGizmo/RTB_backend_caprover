@@ -21,7 +21,33 @@ const getAllEventos = async (req, res, next) => {
   }
 };
 
-const getEventosProximos = async () => {
+//recoge solo eventos desde fecha actual
+const getEventosDesdeHoy = async (req, res, next) => {
+  try {
+    const hoy = new Date();
+    
+    const eventos = await Evento.find({ date_start: { $gte: hoy } });
+
+    eventos.sort((a, b) => a.date_start - b.date_start);
+
+    return res.json(eventos);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const getEventosParaCalendar = async (req, res, next) => {
+  try {
+    const eventos = await Evento.find({}, '_id title date_start');
+
+    return res.json(eventos);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+
+const getEventosProximosFavoritos = async () => {
   const fechaActual = new Date();
   const fechaUnaSemana = new Date();
   const fechaManana = new Date();
@@ -52,17 +78,10 @@ const getEventosProximos = async () => {
   return eventosProximosActivos;
 };
 
-// const getUsuariosConEventoFavorito = async (eventoId) => {
-//   const usuariosConEventoFavorito = await User.find({
-//     favorites: eventoId,
-//   });
 
-//   return usuariosConEventoFavorito;
-// };
-//manda recordatorio de eventos favoritos
 const remindEvento = async () => {
   try {
-    const eventosProximos = await getEventosProximos();
+    const eventosProximos = await getEventosProximosFavoritos();
 
     if (eventosProximos.length > 0) {
       const usuariosConEventoEnFavoritos = await User.find({
@@ -337,6 +356,8 @@ const updateEvento = async (req, res, next) => {
 
 module.exports = {
   getAllEventos,
+  getEventosDesdeHoy,
+  getEventosParaCalendar,
   sendEventosSemanales,
   getEventoById,
   setEvento,

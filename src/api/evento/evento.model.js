@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-// const Schema=mongoose.Schema es un paso optativo
+
 const EventoSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
