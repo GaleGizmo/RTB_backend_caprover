@@ -14,7 +14,7 @@ const Evento = require("./evento.model");
 const getAllEventos = async (req, res, next) => {
   try {
     const eventos = await Evento.find();
-
+    eventos.sort((a, b) => a.date_start - b.date_start);
     return res.json(eventos);
   } catch (error) {
     return next(error);
@@ -46,6 +46,23 @@ const getEventosParaCalendar = async (req, res, next) => {
   }
 };
 
+const getEventosEntreFechas = async (req, res, next) => {
+  try {
+    const { startDate, endDate } = req.body;
+    
+    const eventos = await Evento.find({
+      date_start: {
+        $gte: startDate,
+        $lte: endDate
+      }
+    });
+    eventos.sort((a, b) => a.date_start - b.date_start);
+   
+    return res.json(eventos);
+  } catch (error) {
+    return next(error);
+  }
+};
 
 const getEventosProximosFavoritos = async () => {
   const fechaActual = new Date();
@@ -357,6 +374,7 @@ const updateEvento = async (req, res, next) => {
 module.exports = {
   getAllEventos,
   getEventosDesdeHoy,
+  getEventosEntreFechas,
   getEventosParaCalendar,
   sendEventosSemanales,
   getEventoById,
