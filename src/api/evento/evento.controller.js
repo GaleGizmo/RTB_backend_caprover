@@ -90,9 +90,9 @@ const getEventosProximosFavoritos = async () => {
         },
       }, // Eventos que ocurran en una semana
     ],
+    status: { $ne: 'cancelled' },
   });
-  const eventosProximosActivos=eventosProximos.filter(evento=>evento.status !=='cancelled')
-  return eventosProximosActivos;
+  return eventosProximos;
 };
 
 
@@ -115,9 +115,11 @@ const remindEvento = async () => {
         console.log("Recordatorios de eventos enviados con éxito");
       } else {
         console.log("No hay usuarios con eventos en favoritos");
+        return;
       }
     } else {
       console.log("No hay eventos próximos");
+      return;
     }
   } catch (error) {
     console.error("Error al enviar los recordatorios de eventos:", error);
