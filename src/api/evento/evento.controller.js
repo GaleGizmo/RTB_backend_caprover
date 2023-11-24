@@ -108,7 +108,8 @@ const remindEvento = async () => {
       if (usuariosConEventoEnFavoritos.length > 0) {
         for (const usuario of usuariosConEventoEnFavoritos) {
           for (const evento of eventosProximos) {
-            await enviarReminderEventos(evento, usuario);
+            if (usuario.favorites && usuario.favorites.includes(evento._id)) {
+            await enviarReminderEventos(evento, usuario)}
           }
         }
         console.log("Recordatorios de eventos enviados con éxito");
