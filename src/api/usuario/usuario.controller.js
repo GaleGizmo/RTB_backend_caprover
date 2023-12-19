@@ -1,6 +1,6 @@
 const { generateSign, generateTempToken } = require("../../utils/jwt");
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const Usuario = require("./usuario.model");
 const { deleteImg } = require("../../middleware/deleteImg");
 const { enviarCorreoRecuperacion } = require("../../utils/email");

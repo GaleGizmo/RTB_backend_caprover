@@ -1,14 +1,13 @@
 {
-    "schemaVersion": 2,
-    "dockerfileLines": [
-      "FROM node:14",
-      "WORKDIR /usr/src/app",
-      "COPY ./package.json ./",
-      "RUN npm install --unsafe-perm",
-      "RUN npm rebuild bcrypt --build-from-source",
-      "COPY ./ ./",
-      "CMD [ \"node\", \"index.js\" ]"
-    ]
-  }
-  
+ "schemaVersion": 2,
+ "dockerfileLines": [
+   "FROM node:18.12",
+   "WORKDIR /usr/src/app",
+   "COPY ./package.json ./",
+   "RUN npm install --unsafe-perm",
+   "COPY ./ ./",
+   "CMD [ \"node\", \"index.js\" ]"
+ ]
+}
+
   
