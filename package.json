@@ -1,16 +1,15 @@
 {
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "concurrently --kill-others-on-fail \"npm run dev\" \"npm run client \"",
     "iniciar": "node index.js",
     "dev": "nodemon index.js",
-    "UserSeed": "node ./src/utils/seeds/usuario.seed.js",
-    "EventoSeed": "node ./src/utils/seeds/evento.seed.js",
-    "ComentarioSeed": "node ./src/utils/seeds/comentario.seed.js"
+    "client": "cd.. && npm run dev --prefix ./ROCK-THE-BARRIO_FRONT"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cloudinary": "^1.37.0",
+    "concurrently": "^8.2.2",
     "cors": "^2.8.5",
     "dotenv": "^16.1.3",
     "express": "^4.18.2",

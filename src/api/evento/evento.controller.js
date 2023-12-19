@@ -90,7 +90,7 @@ const getEventosProximosFavoritos = async () => {
         },
       }, // Eventos que ocurran en una semana
     ],
-    status: { $ne: 'cancelled' },
+    status: { $ne: 'cancelled' }, //descarta los que se hayan cancelado
   });
   return eventosProximos;
 };
