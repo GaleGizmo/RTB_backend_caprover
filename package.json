@@ -1,9 +1,9 @@
 {
   "main": "index.js",
   "scripts": {
-    "start": "concurrently --kill-others-on-fail \"npm run dev\" \"npm run client \"",
+    "startAll": "concurrently --kill-others-on-fail \"npm run start\" \"npm run client \"",
     "iniciar": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "nodemon index.js",
     "client": "cd.. && npm run dev --prefix ./ROCK-THE-BARRIO_FRONT"
   },
   "dependencies": {
