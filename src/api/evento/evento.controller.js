@@ -195,7 +195,7 @@ const sendEventosSemanalesHandler = async (req, res) => {
     res.status(500).send({ error: "Error al enviar eventos semanales" });
   }
 };
-const sendEventosDiarios = async () => {
+const sendEventosDiarios = async (res) => {
   try {
     const hoy = new Date();
     const semanal = false;
@@ -227,12 +227,12 @@ const sendEventosDiarios = async () => {
         "email username"
       ).lean();
       await sendCorreos(usuarios, eventosDia, semanal);
-      console.log({ message: "Eventos añadidos hoy enviados con éxito" });
+      res.status(200).send({ message: "Eventos de hoxe enviados" });
     } else {
-      console.log({ message: "No se han añadido eventos hoy" });
+      res.status(200).send({ message: "Non se engadiron eventos" });
     }
   } catch (error) {
-    console.error("Error al enviar eventos de hoy:", error.message);
+    res.status(500).send({ error: "Error al enviar eventos de hoy" });
   }
 };
 const sendEventosDiariosHandler = async (req, res) => {
