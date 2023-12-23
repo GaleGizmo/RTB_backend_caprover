@@ -15,7 +15,10 @@ eventoRoutes.put('/:idEvento', [isAdmin],upload.single("image"),updateEvento);
 eventoRoutes.post('/', [isAdmin],upload.single("image"), setEvento);
 eventoRoutes.get('/sendEventosSemanales', sendEventosSemanalesHandler);
 eventoRoutes.get('/remindEvento', remindEventosHandler);
-eventoRoutes.get('/sendEventosDiarios', sendEventosDiarios);
+eventoRoutes.get('/sendEventosDiarios', async (req, res) => {
+    const result = await sendEventosDiarios();
+    res.status(result.status).send({ message: result.message });
+  });
 eventoRoutes.delete('/:idEvento', [isAdmin],deleteEvento);
 
 module.exports = eventoRoutes;
