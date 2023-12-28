@@ -59,7 +59,7 @@ const enviarCorreo = async (destinatario, eventos, semanal) => {
         <span>Artista: </span><h3 style="display: inline;">${evento.artist}</h3>
         <p>Data: día <strong>${dia}</strong> de <strong>${nombreMes}</strong></p>
         <p>Lugar:<strong> ${lugar}</strong></p>
-        <p>Máis detalles <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> aquí</a></p>
+        <p>Máis detalles <a href="https://www.rockthebarrio.es/${evento._id}"> aquí</a></p>
         </div>
         <br/>
       `;
@@ -81,8 +81,8 @@ const enviarCorreo = async (destinatario, eventos, semanal) => {
       ${tipoEventos}
       ${eventosHTML}
       <p></p>
-      <p style="font-size: 10px; color: #555;">Para deixar de recibir este correo preme <a href="https://rock-the-barrio-front-one.vercel.app/reset-password/${unsubscribe}"> aquí</a>.</p>
-      <p style="font-size: 10px; color: #555;">Podes ver aquí os <a href="https://rock-the-barrio-front-one.vercel.app/terminos"> Termos e Condicións </a> e a nosa <a href="https://rock-the-barrio-front-one.vercel.app/privacidad"> Política de Privacidade</a>.</p>
+      <p style="font-size: 10px; color: #555;">Para deixar de recibir este correo preme <a href="https://www.rockthebarrio.es/reset-password/${unsubscribe}"> aquí</a>.</p>
+      <p style="font-size: 10px; color: #555;">Podes ver aquí os <a href="https://www.rockthebarrio.es/terminos"> Termos e Condicións </a> e a nosa <a href="https://www.rockthebarrio.es/privacidad"> Política de Privacidade</a>.</p>
       </div>`;
     const mensaje = {
       from: ' Rock The Barrio <rockthebarrio@gmail.com>',
@@ -122,10 +122,10 @@ const enviarCorreo = async (destinatario, eventos, semanal) => {
 //     let contenidoEmail=""
 //     if (evento.title===evento.artist){
 //       contenidoEmail=`<p>Ola, ${destinatario.username}!</p><p></p> <p>Engadiuse un novo evento musical: <h2><strong> ${evento.title}</strong></h2> o día <strong>${dia}</strong> de<strong> ${nombreMes}</strong>.</p>
-//       <p>Máis detalles  <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> aquí.</a></p> <p></p> <p>Para deixar de recibir estes correos preme <a href="https://rock-the-barrio-front-one.vercel.app/reset-password/unsubscribenewevent"> aquí</a>.</p><p>Podes ver aquí os <a href="https://rock-the-barrio-front-one.vercel.app/terminos"> Termos e Condicións </a> e a nosa <a href="https://rock-the-barrio-front-one.vercel.app/privacidad"> Política de Privacidade</a>.</p>`
+//       <p>Máis detalles  <a href="https://www.rockthebarrio.es/${evento._id}"> aquí.</a></p> <p></p> <p>Para deixar de recibir estes correos preme <a href="https://www.rockthebarrio.es/reset-password/unsubscribenewevent"> aquí</a>.</p><p>Podes ver aquí os <a href="https://www.rockthebarrio.es/terminos"> Termos e Condicións </a> e a nosa <a href="https://www.rockthebarrio.es/privacidad"> Política de Privacidade</a>.</p>`
 //     } else {
 //       contenidoEmail=`<p>Ola, ${destinatario.username}!</p><p></p> <p>Engadiuse un novo evento musical: <p></p><h2><strong> ${evento.title}</strong></h2> con <h3><strong> ${evento.artist}</strong></h3> o día <strong>${dia}</strong> de<strong> ${nombreMes}</strong>.</p>
-//       <p>Máis detalles  <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> aquí.</a></p> <p></p> <p>Para deixar de recibir estes correos preme <a href="https://rock-the-barrio-front-one.vercel.app/reset-password/unsubscribenewevent"> aquí</a>.</p><p>Podes ver aquí os <a href="https://rock-the-barrio-front-one.vercel.app/terminos"> Termos e Condicións </a> e a nosa <a href="https://rock-the-barrio-front-one.vercel.app/privacidad"> Política de Privacidade</a>.</p>`
+//       <p>Máis detalles  <a href="https://www.rockthebarrio.es/${evento._id}"> aquí.</a></p> <p></p> <p>Para deixar de recibir estes correos preme <a href="https://www.rockthebarrio.es/reset-password/unsubscribenewevent"> aquí</a>.</p><p>Podes ver aquí os <a href="https://www.rockthebarrio.es/terminos"> Termos e Condicións </a> e a nosa <a href="https://www.rockthebarrio.es/privacidad"> Política de Privacidade</a>.</p>`
 //     }
 
 //     const mensaje = {
@@ -160,7 +160,7 @@ const enviarReminderEventos = async (evento, usuario) => {
         <span>Artista: </span><h3 style="display: inline;">${evento.artist}</h3>
         <p>Data: día <strong>${dia}</strong></p>
         <p>Lugar:<strong> ${lugar}</strong></p>
-        <p>Máis detalles <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> aquí</a></p>
+        <p>Máis detalles <a href="https://www.rockthebarrio.es/${evento._id}"> aquí</a></p>
         </div>
         <br/>
         </div>`,
@@ -184,7 +184,7 @@ const enviarCorreoRecuperacion = async (destinatario, token) => {
       html: `<p>Ola, ${destinatario.username},</p>
              <p>Semella que solicitaches restablecer o teu contrasinal na nosa aplicación.</p>
              <p>Clica no seguinte enlace, ou copiao e pégao no teu navegador, para cambia-lo teu contrasinal:</p>
-             <a href="https://rock-the-barrio-front-one.vercel.app/reset-password/${token}">Restablecer contrasinal</a>
+             <a href="https://www.rockthebarrio.es/reset-password/${token}">Restablecer contrasinal</a>
              <span>(Este enlace caduca en 60 minutos)</span>
              <p>Se non solicitaches restablece-lo teu contrasinal, borra por favor este correo.</p>
              <p>Grazas,</p>
