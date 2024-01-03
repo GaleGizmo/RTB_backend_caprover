@@ -8,6 +8,7 @@ const EventoSchema = new mongoose.Schema(
     user_creator: { type: mongoose.Types.ObjectId, ref:"usuario",  required: true  }, 
     site: { type: String, required: true }, 
     price: { type: Number,  required: true  },
+    payWhatYouWant: {type: Boolean, default:false},
     date_start: { type: Date, required: true },
     date_end: { type: Date},
     buy_ticket: {type: String},
