@@ -93,7 +93,7 @@ const enviarCorreo = async (destinatario, eventos, semanal) => {
     const respuesta = await transporter.sendMail(mensaje);
     console.log("Correo electrónico enviado:", respuesta);
   } catch (error) {
-    console.error("Error al enviar el correo electrónico:", error);
+    console.error("Error al enviar el correo electrónico a:",destinatario.email, error.response);
     throw new Error("No se pudo enviar el correo electrónico.");
   }
 };

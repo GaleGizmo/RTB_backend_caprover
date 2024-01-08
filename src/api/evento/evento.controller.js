@@ -150,9 +150,10 @@ const getEventosAEnviar = async (fechaInicio, fechaFin, field) => {
 
 const sendCorreos = async (usuarios, eventos, tipoCorreo) => {
   
-  await Promise.all(
-    usuarios.map((usuario) => enviarCorreo(usuario, eventos, tipoCorreo))
-  );
+  for (const usuario of usuarios) {
+    await enviarCorreo(usuario, eventos, tipoCorreo);
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Esperar 1 segundo entre cada envío
+  }
 };
 
 //manda por mail eventos de la semana
