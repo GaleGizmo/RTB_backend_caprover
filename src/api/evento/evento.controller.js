@@ -261,32 +261,32 @@ async function generateUniqueShortUrl() {
  }
  
 
-async function addUniqueShortUrlToEvents() {
- const events = await Evento.find(); 
+// async function addUniqueShortUrlToEvents() {
+//  const events = await Evento.find(); 
  
- for (const event of events) {
-   let unique = false;
-   let shortUrl;
+//  for (const event of events) {
+//    let unique = false;
+//    let shortUrl;
    
-   while (!unique) {
-     shortUrl = nanoid(4); 
-     try {
-       await Evento.updateOne({ _id: event._id }, { $set: { shortURL: shortUrl } });
-       unique = true; 
-     } catch (error) {
-       if (error.code === 11000) { // Error de violación de índice único
-        console.log("ID duplicado, se intentará crear un nuevo ID");
-         continue; // Intentar con un nuevo ID
-       } else {
-         throw error; 
-       }
-     }
-   }
- }
+//    while (!unique) {
+//      shortUrl = nanoid(4); 
+//      try {
+//        await Evento.updateOne({ _id: event._id }, { $set: { shortURL: shortUrl } });
+//        unique = true; 
+//      } catch (error) {
+//        if (error.code === 11000) { 
+//         console.log("ID duplicado, se intentará crear un nuevo ID");
+//          continue; 
+//        } else {
+//          throw error; 
+//        }
+//      }
+//    }
+//  }
  
- console.log('Todos los eventos han sido actualizados con shortURL únicos.');
-}
-addUniqueShortUrlToEvents().catch(console.error);
+//  console.log('Todos los eventos han sido actualizados con shortURL únicos.');
+// }
+// addUniqueShortUrlToEvents().catch(console.error);
 
 //Recogemos un evento por id
 const getEventoById = async (req, res, next) => {
