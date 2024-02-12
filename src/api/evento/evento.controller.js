@@ -25,7 +25,7 @@ const getAllEventos = async (req, res, next) => {
 const getEventosDesdeHoy = async (req, res, next) => {
   try {
     const hoy = new Date();
-    
+    hoy.setHours(0,0,0,0)
     const eventos = await Evento.find({ date_start: { $gte: hoy } });
 
     eventos.sort((a, b) => a.date_start - b.date_start);
