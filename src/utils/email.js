@@ -81,6 +81,9 @@ const enviarCorreo = async (destinatario, eventos, semanal) => {
       ${tipoEventos}
       ${eventosHTML}
       <p></p>
+      <p style="display: inline; font-size: 14px; font-weight:700; color: red;">ACLARACIÓN: </p><p style="display: inline; font-size: 14px; font-weight: 600; color: black;"> Dada a escasa marxe de tempo con que algúns locais publicitan os seus concertos, este email non contén todos (ainda que si a maioría) os eventos musicais da semana. Para asegurarte de non perder nada, aconsellámoste que marques a casiña "Email con novos eventos" no teu perfil, ou ben que visites a nosa web regularmente.</p>
+      <p></p>
+      <p></p>
       <p style="font-size: 10px; color: #555;">Para deixar de recibir este correo preme <a href="https://www.rockthebarrio.es/reset-password/${unsubscribe}"> aquí</a>.</p>
       <p style="font-size: 10px; color: #555;">Podes ver aquí os <a href="https://www.rockthebarrio.es/terminos"> Termos e Condicións </a> e a nosa <a href="https://www.rockthebarrio.es/privacidad"> Política de Privacidade</a>.</p>
       </div>`;
