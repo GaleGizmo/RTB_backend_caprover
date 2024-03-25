@@ -51,7 +51,7 @@ const enviarCorreo = async (destinatario, eventos, semanal) => {
       ];
 
       const nombreMes = mesesEnGallego[mes];
-      const lugar=evento.site.split(",")[0]
+      const lugar = evento.site.split(",")[0];
 
       eventosHTML += `
        <div style="font-family: Arial, sans-serif; margin: 10px auto ; width:70%;  border: 2px solid #000; border-radius: 10px; padding: 10px 20px; background-image:linear-gradient(to bottom, #f16704, #fff);  ">
@@ -67,28 +67,30 @@ const enviarCorreo = async (destinatario, eventos, semanal) => {
     let tipoEventos = "";
     let unsubscribe = "";
     let emailSubject = "";
+    let avisoSemanal = "";
     if (semanal) {
       tipoEventos = "<h1><u>EVENTOS SEMANAIS</u></h1>";
       unsubscribe = "unsubscribenewsletter";
       emailSubject = "Eventos da semana";
+      avisoSemanal =
+        "<p style='display: inline; font-size: 14px; font-weight:700; color: red;'>ACLARACIÓN: </p><p style='display: inline; font-size: 14px; font-weight: 600; color: black;'> Dada a escasa marxe de tempo con que algúns locais publicitan os seus concertos, este email non contén todos (ainda que si a maioría) os eventos musicais da semana. Para asegurarte de non perder nada, aconsellámoste que marques a casiña 'Email con novos eventos' no teu perfil, ou ben que visites a nosa web regularmente.</p> <p></p> <p></p>";
     } else {
       tipoEventos = "<h2><u>Eventos engadidos HOXE</u></h2>";
       unsubscribe = "unsubscribenewevent";
       emailSubject = "Novos eventos";
+      avisoSemanal="<p></p>"
     }
     const contenido = `
      <div style="display: block; width: 100%; text-align:center;"> <p>Ola, ${destinatario.username}!</p>
       ${tipoEventos}
       ${eventosHTML}
       <p></p>
-      <p style="display: inline; font-size: 14px; font-weight:700; color: red;">ACLARACIÓN: </p><p style="display: inline; font-size: 14px; font-weight: 600; color: black;"> Dada a escasa marxe de tempo con que algúns locais publicitan os seus concertos, este email non contén todos (ainda que si a maioría) os eventos musicais da semana. Para asegurarte de non perder nada, aconsellámoste que marques a casiña "Email con novos eventos" no teu perfil, ou ben que visites a nosa web regularmente.</p>
-      <p></p>
-      <p></p>
+      ${avisoSemanal}
       <p style="font-size: 10px; color: #555;">Para deixar de recibir este correo preme <a href="https://www.rockthebarrio.es/reset-password/${unsubscribe}"> aquí</a>.</p>
       <p style="font-size: 10px; color: #555;">Podes ver aquí os <a href="https://www.rockthebarrio.es/terminos"> Termos e Condicións </a> e a nosa <a href="https://www.rockthebarrio.es/privacidad"> Política de Privacidade</a>.</p>
       </div>`;
     const mensaje = {
-      from: ' Rock The Barrio <rockthebarrio@gmail.com>',
+      from: " Rock The Barrio <rockthebarrio@gmail.com>",
       to: destinatario.email,
       subject: emailSubject,
       html: contenido,
@@ -96,7 +98,11 @@ const enviarCorreo = async (destinatario, eventos, semanal) => {
     const respuesta = await transporter.sendMail(mensaje);
     console.log("Correo electrónico enviado:", respuesta);
   } catch (error) {
-    console.error("Error al enviar el correo electrónico a:",destinatario.email, error.response);
+    console.error(
+      "Error al enviar el correo electrónico a:",
+      destinatario.email,
+      error.response
+    );
     throw new Error("No se pudo enviar el correo electrónico.");
   }
 };
@@ -150,9 +156,9 @@ const enviarReminderEventos = async (evento, usuario) => {
   try {
     const transporter = await createTransporter();
     const dia = evento.date_start.getDate();
-    const lugar=evento.site.split(",")[0]
+    const lugar = evento.site.split(",")[0];
     const mensaje = {
-      from: ' Rock The Barrio <rockthebarrio@gmail.com>',
+      from: " Rock The Barrio <rockthebarrio@gmail.com>",
       to: usuario.email,
       subject: "Recordatorio de evento",
       html: `<div style="display: block; width: 100%; text-align:center;">
@@ -181,7 +187,7 @@ const enviarCorreoRecuperacion = async (destinatario, token) => {
     const transporter = await createTransporter();
 
     const mensaje = {
-      from: ' Rock The Barrio <rockthebarrio@gmail.com>',
+      from: " Rock The Barrio <rockthebarrio@gmail.com>",
       to: destinatario.email,
       subject: "Recuperación de contrasinal",
       html: `<p>Ola, ${destinatario.username},</p>
