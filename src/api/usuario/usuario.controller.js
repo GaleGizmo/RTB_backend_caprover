@@ -17,13 +17,13 @@ const login = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(401).json({ message: "Credenciales erróneas" });
+      return res.status(401).json({ message: "Credenciais erróneas" });
     }
 
     // Verifica la contraseña
     const isPasswordValid = bcrypt.compareSync(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Credenciales erróneas" });
+      return res.status(401).json({ message: "Credenciais erróneas" });
     }
 
     // Genera el token
@@ -41,14 +41,14 @@ const createUsuario = async (req, res, next) => {
 
     // Verifica si ya existe un usuario con el mismo email o username
     if (!req.body.email) {
-      return res.status(400).json({ message: "El email es obligatorio" });
+      return res.status(400).json({ message: "O email é obligatorio" });
     }
     const existingEmailUser = await Usuario.findOne({ email: req.body.email });
     if (existingEmailUser) {
-      return res.status(400).json({ message: "Este email ya está en uso" });
+      return res.status(400).json({ message: "Este email xa está en uso" });
     }
     if (!req.body.username) {
-      return res.status(400).json({ message: "El usuario es obligatorio" });
+      return res.status(400).json({ message: "O usuario é obligatorio" });
     }
     const existingUsernameUser = await Usuario.findOne({
       username: req.body.username,
@@ -56,7 +56,7 @@ const createUsuario = async (req, res, next) => {
     if (existingUsernameUser) {
       return res
         .status(400)
-        .json({ message: "Nombre de usuario no disponible" });
+        .json({ message: "Nombre de usuario non dispoñible" });
     }
 
     // Asigna role user si se intenta asignar admin
@@ -101,22 +101,22 @@ const editUsuario = async (req, res, next) => {
     // Busca al usuario por su ID
     const userToUpdate = await Usuario.findById(idUsuario);
     if (!userToUpdate) {
-      console.log("usuario no existe")
-      return res.status(404).json({ message: "Usuario non encontrado" });
+      console.log("usuario non existe")
+      return res.status(404).json({ message: "Usuario non atopado" });
     }
     const existingEmailUser = await Usuario.findOne({ email: email });
     if (existingEmailUser && existingEmailUser._id != idUsuario) {
       console.error("Este email está en uso")
-      return res.status(400).json({ message: "Este email está en uso" });
+      return res.status(400).json({ message: "Este email xa está en uso" });
     }
     const existingUsernameUser = await Usuario.findOne({
       username: username,
     });
     if (existingUsernameUser && existingUsernameUser._id != idUsuario) {
-      console.error("Este usuario ya está ocupado")
+      console.error("Este usuario xa está ocupado")
       return res
         .status(400)
-        .json({ message: "Nombre de usuario no disponible" });
+        .json({ message: "Nombre de usuario non dispoñible" });
     }
     // Actualiza los datos del usuario si es procedente
 
@@ -168,7 +168,7 @@ const deleteUsuario = async (req, res, next) => {
     if (!usuarioToDelete) {
       await session.abortTransaction();
       session.endSession();
-      return res.status(404).json({ message: "Usuario non encontrado" });
+      return res.status(404).json({ message: "Usuario non atopado" });
     } else {
       if (usuarioToDelete.avatar) {
         deleteImg(usuarioToDelete.avatar);
@@ -190,7 +190,7 @@ const forgotPassword = async (req, res) => {
   try {
     const user = await Usuario.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
+      return res.status(404).json({ message: "Usuario non atopado" });
     }
     const token = generateTempToken(user._id);
     console.log(token, user);
@@ -201,15 +201,15 @@ const forgotPassword = async (req, res) => {
     res.status(200).json({
       token,
       message:
-        "Se ha enviado un correo electrónico de recuperación de contraseña",
+        "Enviouse un email de recuperación de contrasinal",
     });
   } catch (error) {
     console.error(
-      "Error al procesar la solicitud de recuperación de contraseña:",
+      "Erro ao procesar a solicitude de recuperación de contrasinal:",
       error
     );
     res.status(500).json({
-      message: "Error al procesar la solicitud de recuperación de contraseña",
+      message: "Erro ao procesar a solicitude de recuperación de contrasinal",
     });
   }
 };
@@ -223,7 +223,7 @@ const resetPassword = async (req, res, next) => {
       resetPasswordExpires: { $gt: Date.now() },
     });
     if (!user) {
-      return res.status(400).json({ message: "Token inválido o expirado" });
+      return res.status(400).json({ message: "Token inválido ou expirado" });
     }
 
     // Actualizar la contraseña del usuario
@@ -233,10 +233,10 @@ const resetPassword = async (req, res, next) => {
     user.resetPasswordExpires = null;
     await user.save();
 
-    res.status(200).json({ message: "Contraseña restablecida exitosamente" });
+    res.status(200).json({ message: "Contrasinal restablecido exitosamente" });
   } catch (error) {
-    console.error("Error al restablecer la contraseña:", error);
-    res.status(500).json({ message: "Error al restablecer la contraseña" });
+    console.error("Erro ao restablecer o contrasinal:", error);
+    res.status(500).json({ message: "Erro ao restablecer o contrasinal" });
   }
 };
 const unsubscribe = async (req, res, next) => {
@@ -247,7 +247,7 @@ const unsubscribe = async (req, res, next) => {
     const user = await Usuario.findOne({ email: email });
    
     if (!user) {
-      return res.status(404).json({ message: "Usuario non encontrado" });
+      return res.status(404).json({ message: "Usuario non atopado" });
     }
     if (user && user._id.toString()!==idUsuario){
       return res.status(400).json({ message: "Non estás autorizado" })
@@ -257,8 +257,8 @@ const unsubscribe = async (req, res, next) => {
     await user.save();
     res.status(200).json({ user, message: "Axustes de suscripción cambiados" });
   } catch (error) {
-    console.error("Error al cancelar la suscripción:", error);
-    res.status(500).json({ message: "Error al cambiar la suscripción" });
+    console.error("Erro ao cancelar a suscripción:", error);
+    res.status(500).json({ message: "Erro ao cambiar a suscripción" });
   }
 };
 
@@ -267,11 +267,11 @@ const addFavorite=async(req, res, next)=>{
   try {
     const usuario = await Usuario.findById(userId);
     if (!usuario) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
+      return res.status(404).json({ message: "Usuario non atopado" });
     }
     const evento = await Evento.findById(eventId);
     if (!evento) {
-      return res.status(404).json({ message: "Evento no encontrado" });
+      return res.status(404).json({ message: "Evento non atopado" });
     }
     if (add) {usuario.favorites.push(eventId);}
     else {usuario.favorites.pull(eventId);}
@@ -280,12 +280,12 @@ const addFavorite=async(req, res, next)=>{
     
 
     res.json({
-      message: add ? " Evento añadido correctamente": "Evento eliminado correctamente", 
+      message: add ? " Evento engadido correctamente": "Evento eliminado correctamente", 
       
     });
   } catch (error) {
     
-    res.status(500).json({ message: "Error al modificar favoritos" });
+    res.status(500).json({ message: "Erro ao modificar favoritos" });
   }
 
 }

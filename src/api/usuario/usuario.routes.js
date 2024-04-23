@@ -1,5 +1,5 @@
 const express = require('express');
-const { isAdmin, isAdminOrOwner, isAuth } = require("../../middleware/auth.js")
+const {  isAdminOrOwner, authenticate } = require("../../middleware/auth.js")
 const usuarioRoutes=express.Router();   
 const upload = require('../../middleware/img.js');
 const { createUsuario, deleteUsuario, login, editUsuario, forgotPassword, resetPassword, unsubscribe, addFavorite } = require('./usuario.controller.js');
@@ -11,5 +11,5 @@ usuarioRoutes.put('/reset-password/unsubscribe/:idUsuario',[isAdminOrOwner], uns
 usuarioRoutes.delete('/:idUsuario',[isAdminOrOwner], deleteUsuario);
 usuarioRoutes.post('/recuperar-password', forgotPassword)
 usuarioRoutes.post('/reset-password', resetPassword)
-usuarioRoutes.patch('/add-favorite', [isAuth], addFavorite)
+usuarioRoutes.patch('/add-favorite', [authenticate], addFavorite)
 module.exports=usuarioRoutes;

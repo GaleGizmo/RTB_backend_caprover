@@ -15,7 +15,7 @@ const getComentariosByUser = async (req, res, next) => {
     const { userId } = req.params;
     const comentarios = await Comentario.find({ user: userId }).sort({createdAt: -1});
     if (!comentarios || comentarios.length === 0) {
-      return res.status(404).json({ message: "No se encontraron comentarios para este usuario." });
+      return res.status(404).json({ message: "Non se atoparon comentarios para este usuario." });
     }
     return res.status(200).json(comentarios);
   } catch (error) {
@@ -39,7 +39,7 @@ const createComentario = async (req, res, next) => {
     const { user, event, title, content, value } = req.body;
 
     if (!user || !event ) {
-      return res.status(400).json({ message: "Faltan campos obligatorios" });
+      return res.status(400).json({ message: "Faltan campos obrigatorios" });
     }
     if (!title && !value){
       return res.status(400).json({message: "Debes cubrir Título ou Valoración"})
@@ -73,11 +73,11 @@ const editComentario = async (req, res, next) => {
     const comentarioToUpdate = await Comentario.findById(idComentario);
 
     if (!comentarioToUpdate) {
-      return res.status(404).json({ message: "Comentario no encontrado" });
+      return res.status(404).json({ message: "Comentario non atopado" });
     }
 
     if (!title && !value) {
-      return res.status(404).json({ message: "Debes cubrir título ou valoración" });
+      return res.status(404).json({ message: "Debes cubrir Título ou Valoración" });
     } 
     if (title)  comentarioToUpdate.title = title;
     
@@ -98,12 +98,12 @@ const deleteComentario = async (req, res, next) => {
     const deletedComentario = await Comentario.findById(idComentario);
 
     if (!deletedComentario) {
-      return res.status(404).json({ message: "Comentario no encontrado" });
+      return res.status(404).json({ message: "Comentario non atopado" });
     }
     if (deletedComentario.user.toString() !== userId.toString()) {
       return res
         .status(403)
-        .json({ message: "No tienes permiso para esta acción" });
+        .json({ message: "Non tes permiso para esta acción" });
     }
     await Comentario.findByIdAndDelete(idComentario);
 
