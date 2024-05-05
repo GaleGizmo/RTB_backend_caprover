@@ -140,12 +140,21 @@ const remindEventosHandler = async (req, res) => {
 };
 
 const getEventosAEnviar = async (fechaInicio, fechaFin, field) => {
-  const query = {};
-  query[field] = { $gte: fechaInicio, $lt: fechaFin };
-
-  const eventos= await Evento.find(query).sort({ date_start: 1 });
-  const eventosActivos= eventos.filter(evento=>evento.status !=='cancelled')
-  return eventosActivos
+  try {
+    const query = {};
+    query[field] = { $gte: fechaInicio, $lt: fechaFin };
+  
+    const eventos= await Evento.find(query).sort({ date_start: 1 });
+    //Evita mandar en los eventos diarios los que se añadieran y tuvieran lugar el día anterior
+    if (field === "createdAt"){
+      const eventosExceptoLosDeAyer=eventos.filter(evento=>evento.date_start>fechaFin)
+      return eventosExceptoLosDeAyer
+    }
+    const eventosActivos= eventos.filter(evento=>evento.status !=='cancelled')
+    return eventosActivos
+  } catch (error) {
+    return { status: 500, message: "Error ao obter eventos a mandar" };
+  }
 };
 
 const sendCorreos = async (usuarios, eventos, tipoCorreo) => {

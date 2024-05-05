@@ -75,7 +75,7 @@ const enviarCorreo = async (destinatario, eventos, semanal) => {
       avisoSemanal =
         "<p style='display: inline; font-size: 14px; font-weight:700; color: red;'>ACLARACIÓN: </p><p style='display: inline; font-size: 14px; font-weight: 600; color: black;'> Dada a escasa marxe de tempo con que algúns locais publicitan os seus concertos, este email non contén todos (ainda que si a maioría) os eventos musicais da semana. Para asegurarte de non perder nada, aconsellámoste que marques a casiña 'Email con novos eventos' no teu perfil, ou ben que visites a nosa web regularmente.</p> <p></p> <p></p>";
     } else {
-      tipoEventos = "<h2><u>Eventos engadidos HOXE</u></h2>";
+      tipoEventos = "<h2><u>Últimos eventos engadidos</u></h2>";
       unsubscribe = "unsubscribenewevent";
       emailSubject = "Novos eventos";
       avisoSemanal="<p></p>"
