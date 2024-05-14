@@ -222,7 +222,7 @@ const sendEventosDiarios = async (req, res, next) => {
       hoy.getFullYear(),
       hoy.getMonth(),
       hoy.getDate(),
-      14,
+      15,
       0,
       0
     );
