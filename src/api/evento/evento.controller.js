@@ -150,7 +150,8 @@ const getEventosAEnviar = async (fechaInicio, fechaFin, field) => {
       const eventosExceptoLosDeAyer=eventos.filter(evento=>evento.date_start>fechaFin)
       return eventosExceptoLosDeAyer
     }
-    const eventosActivos= eventos.filter(evento=>evento.status !=='cancelled')
+    const eventosExcluidos=["cancelled", "soldout"]
+    const eventosActivos= eventos.filter(evento=>!eventosExcluidos.includes(evento.status))
     return eventosActivos
   } catch (error) {
     return { status: 500, message: "Error ao obter eventos a mandar" };
