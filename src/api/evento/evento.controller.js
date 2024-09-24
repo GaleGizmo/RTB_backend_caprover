@@ -147,7 +147,7 @@ const getEventosAEnviar = async (fechaInicio, fechaFin, field) => {
     const eventos= await Evento.find(query).sort({ date_start: 1 });
     //Evita mandar en los eventos diarios los que se añadieran y tuvieran lugar el día anterior
     if (field === "createdAt"){
-      const eventosExceptoLosDeAyer=eventos.filter(evento=>evento.date_start>fechaFin)
+      const eventosExceptoLosDeAyer=eventos.filter(evento=>evento.date_start>fechaFin && evento.status!=="soldout")
       return eventosExceptoLosDeAyer
     }
     const eventosExcluidos=["cancelled", "soldout"]
