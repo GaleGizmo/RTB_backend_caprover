@@ -20,7 +20,14 @@ const getAllEventos = async (req, res, next) => {
     return next(error);
   }
 };
-
+const getDraftEventos = async (req, res, next) => {
+  try {
+    const eventos = await Evento.find({ status: "draft" });
+    return res.json(eventos);
+  } catch (error) {
+    return next(error);
+  }
+};
 //recoge solo eventos desde fecha actual
 const getEventosDesdeHoy = async (req, res, next) => {
   try {
@@ -468,6 +475,7 @@ actualizarStatusEnEventos();
 module.exports = {
   getAllEventos,
   getEventosDesdeHoy,
+  getDraftEventos,
   getEventosEntreFechas,
   getEventosParaCalendar,
   sendEventosSemanales,

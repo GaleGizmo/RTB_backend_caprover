@@ -2,12 +2,13 @@ const express = require('express');
 const { isAdmin } = require("../../middleware/auth.js")
 const eventoRoutes = express.Router();
 
-const { getAllEventos,setEvento, deleteEvento, updateEvento, getEventoById, sendEventosSemanalesHandler, remindEventosHandler, sendEventosDiariosHandler, getEventosDesdeHoy, getEventosParaCalendar, getEventosEntreFechas, sendEventosDiarios } = require('./evento.controller.js');
+const { getAllEventos,setEvento, deleteEvento, updateEvento, getEventoById, sendEventosSemanalesHandler, remindEventosHandler, sendEventosDiariosHandler, getEventosDesdeHoy, getEventosParaCalendar, getEventosEntreFechas, sendEventosDiarios, getDraftEventos } = require('./evento.controller.js');
 const { checkEventMandatoryFields } = require('../../middleware/checkfields.js');
 const upload = require('../../middleware/img.js');
 
 eventoRoutes.get('/', getAllEventos);
 eventoRoutes.get('/eventosDesdeHoy', getEventosDesdeHoy);
+eventoRoutes.get('/drafts', [isAdmin], getDraftEventos);
 eventoRoutes.get('/eventosParaCalendar', getEventosParaCalendar)
 eventoRoutes.post('/eventosEntreFechas', getEventosEntreFechas)
 eventoRoutes.get("/getbyid/:idEvento", getEventoById)
