@@ -2,18 +2,18 @@ const { checkMandatoryFields } = require("../../middleware/checkfields");
 const { deleteImg } = require("../../middleware/deleteImg");
 const {
   enviarCorreo,
-  
 
   enviarReminderEventos,
 } = require("../../utils/email");
 
 const User = require("../usuario/usuario.model");
 const Evento = require("./evento.model");
-const { nanoid } = require('nanoid');
+const { nanoid } = require("nanoid");
+
 //recoge todos los eventos de la BBDD
 const getAllEventos = async (req, res, next) => {
   try {
-    const eventos = await Evento.find();
+    const eventos = await Evento.find({ status: { $ne: "draft" } });
     eventos.sort((a, b) => a.date_start - b.date_start);
     return res.json(eventos);
   } catch (error) {
@@ -25,8 +25,11 @@ const getAllEventos = async (req, res, next) => {
 const getEventosDesdeHoy = async (req, res, next) => {
   try {
     const hoy = new Date();
-    hoy.setHours(0,0,0,0)
-    const eventos = await Evento.find({ date_start: { $gte: hoy } });
+    hoy.setHours(0, 0, 0, 0);
+    const eventos = await Evento.find({
+      date_start: { $gte: hoy },
+      status: { $ne: "draft" },
+    });
 
     eventos.sort((a, b) => a.date_start - b.date_start);
 
@@ -38,7 +41,10 @@ const getEventosDesdeHoy = async (req, res, next) => {
 
 const getEventosParaCalendar = async (req, res, next) => {
   try {
-    const eventos = await Evento.find({}, '_id title date_start');
+    const eventos = await Evento.find(
+      { status: { $ne: "draft" } },
+      "_id title date_start"
+    );
 
     return res.json(eventos);
   } catch (error) {
@@ -49,15 +55,16 @@ const getEventosParaCalendar = async (req, res, next) => {
 const getEventosEntreFechas = async (req, res, next) => {
   try {
     const { startDate, endDate } = req.body;
-    
+
     const eventos = await Evento.find({
       date_start: {
         $gte: startDate,
-        $lte: endDate
-      }
+        $lte: endDate,
+      },
+      status: { $ne: "draft" },
     });
     eventos.sort((a, b) => a.date_start - b.date_start);
-   
+
     return res.json(eventos);
   } catch (error) {
     return next(error);
@@ -90,11 +97,10 @@ const getEventosProximosFavoritos = async () => {
         },
       }, // Eventos que ocurran en una semana
     ],
-    status: { $ne: 'cancelled' }, //descarta los que se hayan cancelado
+    status: { $nin: ["cancelled", "draft"] }, //descarta los que se hayan cancelado y los borradores
   });
   return eventosProximos;
 };
-
 
 const remindEvento = async () => {
   try {
@@ -109,7 +115,8 @@ const remindEvento = async () => {
         for (const usuario of usuariosConEventoEnFavoritos) {
           for (const evento of eventosProximos) {
             if (usuario.favorites && usuario.favorites.includes(evento._id)) {
-            await enviarReminderEventos(evento, usuario)}
+              await enviarReminderEventos(evento, usuario);
+            }
           }
         }
         console.log("Recordatorios de eventos enviados con éxito");
@@ -143,26 +150,29 @@ const getEventosAEnviar = async (fechaInicio, fechaFin, field) => {
   try {
     const query = {};
     query[field] = { $gte: fechaInicio, $lt: fechaFin };
-  
-    const eventos= await Evento.find(query).sort({ date_start: 1 });
+
+    const eventos = await Evento.find(query).sort({ date_start: 1 });
     //Evita mandar en los eventos diarios los que se añadieran y tuvieran lugar el día anterior
-    if (field === "createdAt"){
-      const eventosExceptoLosDeAyer=eventos.filter(evento=>evento.date_start>fechaFin && evento.status!=="soldout")
-      return eventosExceptoLosDeAyer
+    if (field === "createdAt") {
+      const eventosExceptoLosDeAyer = eventos.filter(
+        (evento) => evento.date_start > fechaFin && evento.status !== "soldout"
+      );
+      return eventosExceptoLosDeAyer;
     }
-    const eventosExcluidos=["cancelled", "soldout"]
-    const eventosActivos= eventos.filter(evento=>!eventosExcluidos.includes(evento.status))
-    return eventosActivos
+    const eventosExcluidos = ["cancelled", "soldout", "draft"];
+    const eventosActivos = eventos.filter(
+      (evento) => !eventosExcluidos.includes(evento.status)
+    );
+    return eventosActivos;
   } catch (error) {
     return { status: 500, message: "Error ao obter eventos a mandar" };
   }
 };
 
 const sendCorreos = async (usuarios, eventos, tipoCorreo) => {
-  
   for (const usuario of usuarios) {
     await enviarCorreo(usuario, eventos, tipoCorreo);
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Esperar 1 segundo entre cada envío
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Esperar 1 segundo entre cada envío
   }
 };
 
@@ -214,7 +224,7 @@ const sendEventosDiarios = async (req, res, next) => {
     const fechaInicio = new Date(
       hoy.getFullYear(),
       hoy.getMonth(),
-      hoy.getDate()-1,
+      hoy.getDate() - 1,
       15,
       0,
       0
@@ -239,12 +249,12 @@ const sendEventosDiarios = async (req, res, next) => {
         "email username"
       ).lean();
       await sendCorreos(usuarios, eventosDia, semanal);
-      return res.status(200).send( {message: "Eventos de hoxe enviados" });
+      return res.status(200).send({ message: "Eventos de hoxe enviados" });
     } else {
-      return res.status(200).send ({message: "No se engadiron eventos"});
+      return res.status(200).send({ message: "No se engadiron eventos" });
     }
   } catch (error) {
-    error.message="Erro ao mandar eventos diarios"
+    error.message = "Erro ao mandar eventos diarios";
     return next(error);
   }
 };
@@ -259,42 +269,41 @@ const sendEventosDiariosHandler = async (req, res) => {
 async function generateUniqueShortUrl() {
   let unique = false;
   let shortUrl;
- 
+
   while (!unique) {
-    shortUrl = nanoid(4); 
+    shortUrl = nanoid(4);
     const existingEvent = await Evento.findOne({ shortURL: shortUrl });
     if (!existingEvent) {
-      unique = true; 
+      unique = true;
     }
   }
- 
+
   return shortUrl;
- }
- 
+}
 
 // async function addUniqueShortUrlToEvents() {
-//  const events = await Evento.find(); 
- 
+//  const events = await Evento.find();
+
 //  for (const event of events) {
 //    let unique = false;
 //    let shortUrl;
-   
+
 //    while (!unique) {
-//      shortUrl = nanoid(4); 
+//      shortUrl = nanoid(4);
 //      try {
 //        await Evento.updateOne({ _id: event._id }, { $set: { shortURL: shortUrl } });
-//        unique = true; 
+//        unique = true;
 //      } catch (error) {
-//        if (error.code === 11000) { 
+//        if (error.code === 11000) {
 //         console.log("ID duplicado, se intentará crear un nuevo ID");
-//          continue; 
+//          continue;
 //        } else {
-//          throw error; 
+//          throw error;
 //        }
 //      }
 //    }
 //  }
- 
+
 //  console.log('Todos los eventos han sido actualizados con shortURL únicos.');
 // }
 // addUniqueShortUrlToEvents().catch(console.error);
@@ -303,10 +312,12 @@ async function generateUniqueShortUrl() {
 const getEventoById = async (req, res, next) => {
   try {
     const { idEvento } = req.params;
-    let evento
-    if (idEvento.length === 4) { // Verifica si el parámetro es un shortURL
+    let evento;
+    if (idEvento.length === 4) {
+      // Verifica si el parámetro es un shortURL
       evento = await Evento.findOne({ shortURL: idEvento });
-    } else { // Si no, asume que es un evento_id
+    } else {
+      // Si no, asume que es un evento_id
       evento = await Evento.findById(idEvento);
     }
     return res.status(200).json(evento);
@@ -332,9 +343,10 @@ const setEvento = async (req, res, next) => {
       image,
       youtubeVideoId,
       genre,
+      status,
     } = req.body;
 
-    const shortURL= await generateUniqueShortUrl();
+    const shortURL = await generateUniqueShortUrl();
     const timestamp = new Date();
     const newEvento = new Evento({
       title,
@@ -351,6 +363,7 @@ const setEvento = async (req, res, next) => {
       image,
       youtubeVideoId,
       genre,
+      status,
       shortURL,
       timestamp,
     });
@@ -358,11 +371,10 @@ const setEvento = async (req, res, next) => {
       newEvento.image = req.file.path;
     }
     await newEvento.save();
-   
 
     return res.status(200).json({ message: "Evento creado con éxito" });
   } catch (error) {
-    error.message="Erro ao crear evento"
+    error.message = "Erro ao crear evento";
     return next(error);
   }
 };
@@ -438,6 +450,20 @@ const updateEvento = async (req, res, next) => {
     return next(error);
   }
 };
+const actualizarStatusEnEventos = async () => {
+  try {
+    // Encuentra y actualiza todas las entradas donde no exista la propiedad "status"
+    const result = await Evento.updateMany(
+      { status: { $exists: false } },  // Filtro: donde no exista el campo "status"
+      { $set: { status: "Ok" } }       // Añadir la propiedad "status" con valor "Ok"
+    );
+    
+    console.log(`${result.nModified} eventos actualizados con status "Ok".`);
+  } catch (error) {
+    console.error("Error al actualizar los eventos:", error);
+  }
+};
+actualizarStatusEnEventos();
 
 module.exports = {
   getAllEventos,
