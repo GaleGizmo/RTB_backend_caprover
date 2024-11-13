@@ -206,8 +206,34 @@ const enviarCorreoRecuperacion = async (destinatario, token) => {
     console.error("Error al enviar el correo electrónico:", error);
   }
 };
+const enviarCorreccionEvento = async (user, evento, mensaje, asunto) =>{
+  try {
+    const transporter = await createTransporter();
+    const contenido = `
+     <div style="display: block; width: 100%; text-align:center;"> <p>Ola, ${user.username}!</p>
+     <p>Por favor, toma nota da seguinte corrección:</p>
+     <p>Evento: <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> ${evento.title}</a></p>
+      <p>Corrección: ${mensaje}</p>
+      <p></p>
+      <p style="font-size: 10px; color: #555;">Podes ver aquí os <a href="https://rock-the-barrio-front-one.vercel.app/terminos"> Termos e Condicións </a> e a nosa <a href="https://rock-the-barrio-front-one.vercel.app/privacidad"> Política de Privacidade</a>.</p>
+      </div>`;
+    const email = {
+      from: ' Rock The Barrio <rockthebarrio@gmail.com>',
+      to: user.email,
+      subject: asunto,
+      html: contenido,
+    };
+    const respuesta = await transporter.sendMail(email);
+    console.log("Correo electrónico enviado:", respuesta);
+  } catch (error) {
+    console.error("Error al enviar el correo electrónico:", error);
+    throw new Error("No se pudo enviar el correo electrónico.");
+  }
+}
+
 module.exports = {
   enviarCorreo,
   enviarCorreoRecuperacion,
   enviarReminderEventos,
+  enviarCorreccionEvento
 };

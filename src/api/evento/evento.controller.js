@@ -288,33 +288,6 @@ async function generateUniqueShortUrl() {
   return shortUrl;
 }
 
-// async function addUniqueShortUrlToEvents() {
-//  const events = await Evento.find();
-
-//  for (const event of events) {
-//    let unique = false;
-//    let shortUrl;
-
-//    while (!unique) {
-//      shortUrl = nanoid(4);
-//      try {
-//        await Evento.updateOne({ _id: event._id }, { $set: { shortURL: shortUrl } });
-//        unique = true;
-//      } catch (error) {
-//        if (error.code === 11000) {
-//         console.log("ID duplicado, se intentará crear un nuevo ID");
-//          continue;
-//        } else {
-//          throw error;
-//        }
-//      }
-//    }
-//  }
-
-//  console.log('Todos los eventos han sido actualizados con shortURL únicos.');
-// }
-// addUniqueShortUrlToEvents().catch(console.error);
-
 //Recogemos un evento por id
 const getEventoById = async (req, res, next) => {
   try {
@@ -457,20 +430,27 @@ const updateEvento = async (req, res, next) => {
     return next(error);
   }
 };
-const actualizarStatusEnEventos = async () => {
-  try {
-    // Encuentra y actualiza todas las entradas donde no exista la propiedad "status"
-    const result = await Evento.updateMany(
-      { status: { $exists: false } },  // Filtro: donde no exista el campo "status"
-      { $set: { status: "Ok" } }       // Añadir la propiedad "status" con valor "Ok"
-    );
-    
-    console.log(`${result.nModified} eventos actualizados con status "Ok".`);
-  } catch (error) {
-    console.error("Error al actualizar los eventos:", error);
+const sendEmailsCorreccion = async (usuarios, evento, mensaje, asunto) => {
+  for (const usuario of usuarios) {
+    await enviarCorreccionEvento(usuario, evento, mensaje, asunto);
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Esperar 500 ms entre cada envío
   }
 };
-actualizarStatusEnEventos();
+const sendCorreccion = async (req, res, next) => {
+  try {
+    const { mensaje, asunto, eventoId } = req.body;
+    const evento = await Evento.findById(eventoId, "_id title").lean();
+    const usuariosANotificar = await User.find(
+      { $or: [{ newevent: true }, { newsletter: true }] },
+      "email username"
+    ).lean();
+   
+    await sendEmailsCorreccion(usuariosANotificar, evento, mensaje, asunto);
+    return res.status(200).json({ message: "Correo enviado con éxito" });
+  } catch (error) {
+    return next(error);
+  }
+};
 
 module.exports = {
   getAllEventos,
@@ -488,4 +468,5 @@ module.exports = {
   remindEventosHandler,
   sendEventosDiarios,
   sendEventosDiariosHandler,
+  sendCorreccion,
 };
