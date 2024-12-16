@@ -289,6 +289,20 @@ const addFavorite=async(req, res, next)=>{
   }
 
 }
+const sendUserMessage = async (req, res, next) => {
+  const { name, email, type, content, user } = req.body;
+
+  try {
+    
+    await enviarMensajeDeUsuario(type, name, email, content);
+   
+ 
+
+    res.status(200).json({ message: "Mensaxe enviada correctamente" });
+  } catch (error) {
+   return next(error);
+  }
+};
 module.exports = {
   login,
   createUsuario,
@@ -297,5 +311,6 @@ module.exports = {
   deleteUsuario,
   resetPassword,
   unsubscribe,
-  addFavorite
+  addFavorite,
+  sendUserMessage
 };

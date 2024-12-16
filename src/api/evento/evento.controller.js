@@ -1,8 +1,8 @@
 const { checkMandatoryFields } = require("../../middleware/checkfields");
 const { deleteImg } = require("../../middleware/deleteImg");
 const {
-  enviarCorreo,
-
+  enviarCorreoEventos,
+  enviarCorreccionEvento,
   enviarReminderEventos,
 } = require("../../utils/email");
 
@@ -157,16 +157,16 @@ const getEventosAEnviar = async (fechaInicio, fechaFin, field) => {
   try {
     const query = {};
     query[field] = { $gte: fechaInicio, $lt: fechaFin };
-
+    const eventosExcluidos = ["cancelled", "soldout", "draft"];
     const eventos = await Evento.find(query).sort({ date_start: 1 });
     //Evita mandar en los eventos diarios los que se añadieran y tuvieran lugar el día anterior
     if (field === "createdAt") {
       const eventosExceptoLosDeAyer = eventos.filter(
-        (evento) => evento.date_start > fechaFin && evento.status !== "soldout"
+        (evento) => evento.date_start > fechaFin && !eventosExcluidos.includes(evento.status)
       );
       return eventosExceptoLosDeAyer;
     }
-    const eventosExcluidos = ["cancelled", "soldout", "draft"];
+    
     const eventosActivos = eventos.filter(
       (evento) => !eventosExcluidos.includes(evento.status)
     );
@@ -178,8 +178,8 @@ const getEventosAEnviar = async (fechaInicio, fechaFin, field) => {
 
 const sendCorreos = async (usuarios, eventos, tipoCorreo) => {
   for (const usuario of usuarios) {
-    await enviarCorreo(usuario, eventos, tipoCorreo);
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Esperar 1 segundo entre cada envío
+    await enviarCorreoEventos(usuario, eventos, tipoCorreo);
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Esperar 1 segundo entre cada envío
   }
 };
 

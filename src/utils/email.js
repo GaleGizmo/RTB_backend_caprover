@@ -28,7 +28,7 @@ const createTransporter = async () => {
 
   return transporter;
 };
-const enviarCorreo = async (destinatario, eventos, semanal) => {
+const enviarCorreoEventos = async (destinatario, eventos, semanal) => {
   try {
     const transporter = await createTransporter();
     let eventosHTML = "";
@@ -106,51 +106,6 @@ const enviarCorreo = async (destinatario, eventos, semanal) => {
     throw new Error("No se pudo enviar el correo electrónico.");
   }
 };
-// const enviarCorreoElectronico = async (destinatario, evento) => {
-//   try {
-//     const transporter = await createTransporter();
-
-//     const dia = evento.date_start.getDate();
-//     const mes = evento.date_start.getMonth();
-//     const mesesEnGallego = [
-//       "Xaneiro",
-//       "Febreiro",
-//       "Marzo",
-//       "Abril",
-//       "Maio",
-//       "Xuño",
-//       "Xullo",
-//       "Agosto",
-//       "Setembro",
-//       "Outubro",
-//       "Novembro",
-//       "Decembro",
-//     ];
-
-//     const nombreMes = mesesEnGallego[mes];
-//     let contenidoEmail=""
-//     if (evento.title===evento.artist){
-//       contenidoEmail=`<p>Ola, ${destinatario.username}!</p><p></p> <p>Engadiuse un novo evento musical: <h2><strong> ${evento.title}</strong></h2> o día <strong>${dia}</strong> de<strong> ${nombreMes}</strong>.</p>
-//       <p>Máis detalles  <a href="https://www.rockthebarrio.es/${evento._id}"> aquí.</a></p> <p></p> <p>Para deixar de recibir estes correos preme <a href="https://www.rockthebarrio.es/reset-password/unsubscribenewevent"> aquí</a>.</p><p>Podes ver aquí os <a href="https://www.rockthebarrio.es/terminos"> Termos e Condicións </a> e a nosa <a href="https://www.rockthebarrio.es/privacidad"> Política de Privacidade</a>.</p>`
-//     } else {
-//       contenidoEmail=`<p>Ola, ${destinatario.username}!</p><p></p> <p>Engadiuse un novo evento musical: <p></p><h2><strong> ${evento.title}</strong></h2> con <h3><strong> ${evento.artist}</strong></h3> o día <strong>${dia}</strong> de<strong> ${nombreMes}</strong>.</p>
-//       <p>Máis detalles  <a href="https://www.rockthebarrio.es/${evento._id}"> aquí.</a></p> <p></p> <p>Para deixar de recibir estes correos preme <a href="https://www.rockthebarrio.es/reset-password/unsubscribenewevent"> aquí</a>.</p><p>Podes ver aquí os <a href="https://www.rockthebarrio.es/terminos"> Termos e Condicións </a> e a nosa <a href="https://www.rockthebarrio.es/privacidad"> Política de Privacidade</a>.</p>`
-//     }
-
-//     const mensaje = {
-//       from: "rockthebarrio@gmail.com",
-//       to: destinatario.email,
-//       subject: "Novo evento musical",
-//       html: contenidoEmail ,
-//     };
-
-//     const respuesta = await transporter.sendMail(mensaje);
-//     console.log("Correo electrónico enviado:", respuesta);
-//   } catch (error) {
-//     console.error("Error al enviar el correo electrónico:", error);
-//     throw new Error("No se pudo enviar el correo electrónico.");
-//   }
-// };
 
 const enviarReminderEventos = async (evento, usuario) => {
   try {
@@ -230,10 +185,40 @@ const enviarCorreccionEvento = async (user, evento, mensaje, asunto) =>{
     throw new Error("No se pudo enviar el correo electrónico.");
   }
 }
+const enviarMensajeDeUsuario = async (
+  asunto,
+  nombreDeUsuario,
+  emailDeUsuario = "N/A",
+  mensaje
+) => {
+  try {
+    const transporter = await createTransporter();
 
+    const contenido = `
+     <div style="display: block; width: 100%; text-align:center;"> <p>Ola, xefe!</p>
+     <p>Tes unha mensaxe de ${nombreDeUsuario}:</p>
+      <p>${mensaje}</p>
+      <p></p>
+      <Correo de resposta: ${emailDeUsuario}>
+      </div>`;
+    const subject = `Mensaxe de ${nombreDeUsuario}: ${asunto}`;
+    const email = {
+      from: " Rock The Barrio <rockthebarrio@gmail.com>",
+      to: "rockthebarrio@gmail.com",
+      subject: subject,
+      html: contenido,
+    };
+    const respuesta = await transporter.sendMail(email);
+    console.log("Correo electrónico enviado:", respuesta);
+  } catch (error) {
+    console.error("Error al enviar el correo electrónico:", error);
+    throw new Error("No se pudo enviar el correo electrónico.");
+  }
+};
 module.exports = {
-  enviarCorreo,
+  enviarCorreoEventos,
   enviarCorreoRecuperacion,
   enviarReminderEventos,
-  enviarCorreccionEvento
+  enviarCorreccionEvento,
+  enviarMensajeDeUsuario,
 };
