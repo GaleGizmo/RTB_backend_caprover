@@ -38,7 +38,11 @@ const getEventosDesdeHoy = async (req, res, next) => {
       status: { $ne: "draft" },
     });
 
-    eventos.sort((a, b) => a.date_start - b.date_start);
+    eventos.sort((a, b) => {
+      if (a.highlighted && !b.highlighted) return -1;
+      if (!a.highlighted && b.highlighted) return 1;
+      return a.date_start - b.date_start;
+    });
 
     return res.json(eventos);
   } catch (error) {
@@ -164,12 +168,14 @@ const getEventosAEnviar = async (fechaInicio, fechaFin, field) => {
       const eventosExceptoLosDeAyer = eventos.filter(
         (evento) => evento.date_start > fechaFin && !eventosExcluidos.includes(evento.status)
       );
+     
       return eventosExceptoLosDeAyer;
     }
     
     const eventosActivos = eventos.filter(
       (evento) => !eventosExcluidos.includes(evento.status)
     );
+    
     return eventosActivos;
   } catch (error) {
     return { status: 500, message: "Error ao obter eventos a mandar" };
@@ -324,6 +330,7 @@ const setEvento = async (req, res, next) => {
       youtubeVideoId,
       genre,
       status,
+      highlighted,
     } = req.body;
 
     const shortURL = await generateUniqueShortUrl();
@@ -344,6 +351,7 @@ const setEvento = async (req, res, next) => {
       youtubeVideoId,
       genre,
       status,
+      highlighted,
       shortURL,
       timestamp,
     });

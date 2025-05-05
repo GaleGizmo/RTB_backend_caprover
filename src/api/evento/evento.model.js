@@ -17,6 +17,7 @@ const EventoSchema = new mongoose.Schema(
     youtubeVideoId: {type: String},
     genre: { type: String },
     status: {type: String},
+    highlighted: {type: Boolean, default:false},
     commentsCount: { type: Number, default: 0 },
     shortURL: {type: String, unique:true}
   },
