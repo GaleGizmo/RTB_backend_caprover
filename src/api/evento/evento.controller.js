@@ -9,7 +9,7 @@ const { DateTime } = require("luxon");
 const User = require("../usuario/usuario.model");
 const Evento = require("./evento.model");
 const { nanoid } = require("nanoid");
-
+const ZONA = "Europe/Madrid";
 //recoge todos los eventos de la BBDD
 const getAllEventos = async (req, res, next) => {
   try {
@@ -31,7 +31,9 @@ const getDraftEventos = async (req, res, next) => {
 //recoge solo eventos desde fecha actual
 const getEventosDesdeHoy = async (req, res, next) => {
   try {
-    const hoy = DateTime.local().startOf("day").toUTC().toJSDate();
+    
+
+    const hoy = DateTime.now().setZone(ZONA).startOf("day").toUTC().toJSDate();
 
     const eventos = await Evento.find({
       date_start: { $gte: hoy },
@@ -83,7 +85,7 @@ const getEventosEntreFechas = async (req, res, next) => {
 };
 
 const getEventosProximosFavoritos = async () => {
-  const hoy = DateTime.local().startOf("day");
+  const hoy = DateTime.now().setZone(ZONA).startOf("day");
 
   const fechaManana = hoy.plus({ days: 1 });
   const fechaUnaSemana = hoy.plus({ days: 6 });
@@ -190,12 +192,15 @@ const sendCorreos = async (usuarios, eventos, tipoCorreo) => {
 const sendEventosSemanales = async () => {
   try {
     const semanal = true;
-    const fechaInicio = DateTime.local().startOf("day");
-    const fechaFin = fechaInicio.plus({ days: 6 }).endOf("day");
+   const hoy = DateTime.now().setZone(ZONA).startOf("day");
+
+    const fechaInicio = hoy.toUTC().toJSDate();
+    const fechaFin = hoy.plus({ days: 6 }).endOf("day").toUTC().toJSDate();
+
     //busca eventos en esa semana
     const eventosSemana = await getEventosAEnviar(
-      fechaInicio.toUTC().toJSDate(),
-      fechaFin.toUTC().toJSDate(),
+      fechaInicio,
+      fechaFin,
       "date_start"
     );
     //busca usuarios que reciben la newsletter
@@ -219,7 +224,7 @@ const sendEventosSemanalesHandler = async (req, res) => {
 const sendEventosDiarios = async (req, res, next) => {
   try {
     const semanal = false;
-    const ahora = DateTime.local();
+    const ahora = DateTime.now().setZone(ZONA);
     const fechaInicio = ahora
       .minus({ days: 1 })
       .set({ hour: 16, minute: 0, second: 0, millisecond: 0 })
