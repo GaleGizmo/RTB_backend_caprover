@@ -5,7 +5,7 @@ const {
   enviarCorreccionEvento,
   enviarReminderEventos,
 } = require("../../utils/email");
-
+const { DateTime } = require("luxon");
 const User = require("../usuario/usuario.model");
 const Evento = require("./evento.model");
 const { nanoid } = require("nanoid");
@@ -31,8 +31,8 @@ const getDraftEventos = async (req, res, next) => {
 //recoge solo eventos desde fecha actual
 const getEventosDesdeHoy = async (req, res, next) => {
   try {
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
+    const hoy = DateTime.local().startOf("day").toUTC().toJSDate();
+
     const eventos = await Evento.find({
       date_start: { $gte: hoy },
       status: { $ne: "draft" },
@@ -83,30 +83,25 @@ const getEventosEntreFechas = async (req, res, next) => {
 };
 
 const getEventosProximosFavoritos = async () => {
-  const fechaActual = new Date();
-  const fechaUnaSemana = new Date();
-  const fechaManana = new Date();
+  const hoy = DateTime.local().startOf("day");
 
-  fechaUnaSemana.setDate(fechaActual.getDate() + 6);
-  fechaUnaSemana.setHours(0, 0, 0, 0);
-
-  fechaManana.setDate(fechaActual.getDate() + 1);
-  fechaManana.setHours(0, 0, 0, 0);
+  const fechaManana = hoy.plus({ days: 1 });
+  const fechaUnaSemana = hoy.plus({ days: 6 });
 
   const eventosProximos = await Evento.find({
     $or: [
       {
         date_start: {
-          $gte: fechaManana,
-          $lt: new Date(fechaManana.getTime() + 24 * 60 * 60 * 1000),
+          $gte: fechaManana.toUTC().toJSDate(),
+          $lt: fechaManana.plus({ days: 1 }).toUTC().toJSDate(),
         },
-      }, // Eventos que ocurran mañana
+      },
       {
         date_start: {
-          $gte: fechaUnaSemana,
-          $lt: new Date(fechaUnaSemana.getTime() + 24 * 60 * 60 * 1000),
+          $gte: fechaUnaSemana.toUTC().toJSDate(),
+          $lt: fechaUnaSemana.plus({ days: 1 }).toUTC().toJSDate(),
         },
-      }, // Eventos que ocurran en una semana
+      },
     ],
     status: { $nin: ["cancelled", "draft"] }, //descarta los que se hayan cancelado y los borradores
   });
@@ -166,16 +161,18 @@ const getEventosAEnviar = async (fechaInicio, fechaFin, field) => {
     //Evita mandar en los eventos diarios los que se añadieran y tuvieran lugar el día anterior
     if (field === "createdAt") {
       const eventosExceptoLosDeAyer = eventos.filter(
-        (evento) => evento.date_start > fechaFin && !eventosExcluidos.includes(evento.status)
+        (evento) =>
+          evento.date_start > fechaFin &&
+          !eventosExcluidos.includes(evento.status)
       );
-     
+
       return eventosExceptoLosDeAyer;
     }
-    
+
     const eventosActivos = eventos.filter(
       (evento) => !eventosExcluidos.includes(evento.status)
     );
-    
+
     return eventosActivos;
   } catch (error) {
     return { status: 500, message: "Error ao obter eventos a mandar" };
@@ -192,24 +189,13 @@ const sendCorreos = async (usuarios, eventos, tipoCorreo) => {
 //manda por mail eventos de la semana
 const sendEventosSemanales = async () => {
   try {
-    const hoy = new Date();
     const semanal = true;
-    //obtenemos la fecha de inicio de la semana y de fin de la semana
-    const fechaInicio = new Date(
-      hoy.getFullYear(),
-      hoy.getMonth(),
-      hoy.getDate()
-    );
-    const fechaFin = new Date(
-      hoy.getFullYear(),
-      hoy.getMonth(),
-      hoy.getDate() + 6
-    );
-    fechaFin.setHours(23, 59, 59, 999);
+    const fechaInicio = DateTime.local().startOf("day");
+    const fechaFin = fechaInicio.plus({ days: 6 }).endOf("day");
     //busca eventos en esa semana
     const eventosSemana = await getEventosAEnviar(
-      fechaInicio,
-      fechaFin,
+      fechaInicio.toUTC().toJSDate(),
+      fechaFin.toUTC().toJSDate(),
       "date_start"
     );
     //busca usuarios que reciben la newsletter
@@ -232,25 +218,17 @@ const sendEventosSemanalesHandler = async (req, res) => {
 };
 const sendEventosDiarios = async (req, res, next) => {
   try {
-    const hoy = new Date();
     const semanal = false;
-    const fechaInicio = new Date(
-      hoy.getFullYear(),
-      hoy.getMonth(),
-      hoy.getDate() - 1,
-      15,
-      0,
-      0
-    );
-    const fechaFin = new Date(
-      hoy.getFullYear(),
-      hoy.getMonth(),
-      hoy.getDate(),
-      15,
-      0,
-      0
-    );
-
+    const ahora = DateTime.local();
+    const fechaInicio = ahora
+      .minus({ days: 1 })
+      .set({ hour: 16, minute: 0, second: 0, millisecond: 0 })
+      .toUTC()
+      .toJSDate();
+    const fechaFin = ahora
+      .set({ hour: 16, minute: 0, second: 0, millisecond: 0 })
+      .toUTC()
+      .toJSDate();
     const eventosDia = await getEventosAEnviar(
       fechaInicio,
       fechaFin,
@@ -452,7 +430,7 @@ const sendCorreccion = async (req, res, next) => {
       { $or: [{ newevent: true }, { newsletter: true }] },
       "email username"
     ).lean();
-   
+
     await sendEmailsCorreccion(usuariosANotificar, evento, mensaje, asunto);
     return res.status(200).json({ message: "Correo enviado con éxito" });
   } catch (error) {
