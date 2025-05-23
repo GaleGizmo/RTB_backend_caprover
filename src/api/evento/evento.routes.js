@@ -15,7 +15,7 @@ const {
   getEventosParaCalendar,
   getEventosEntreFechas,
   sendEventosDiarios,
-  getDraftEventos,
+ 
   sendCorreccion,
 } = require("./evento.controller.js");
 const {
@@ -25,7 +25,7 @@ const upload = require("../../middleware/img.js");
 
 eventoRoutes.get("/", getAllEventos);
 eventoRoutes.get("/eventosDesdeHoy", getEventosDesdeHoy);
-eventoRoutes.get("/drafts", [isAdmin], getDraftEventos);
+// eventoRoutes.get("/drafts", [isAdmin], getDraftEventos);
 eventoRoutes.get("/eventosParaCalendar", getEventosParaCalendar);
 eventoRoutes.post("/eventosEntreFechas", getEventosEntreFechas);
 eventoRoutes.get("/getbyid/:idEvento", getEventoById);

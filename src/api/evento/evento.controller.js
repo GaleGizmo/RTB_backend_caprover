@@ -20,19 +20,17 @@ const getAllEventos = async (req, res, next) => {
     return next(error);
   }
 };
-const getDraftEventos = async (req, res, next) => {
-  try {
-    const eventos = await Evento.find({ status: "draft" });
-    return res.json(eventos);
-  } catch (error) {
-    return next(error);
-  }
-};
+// const getDraftEventos = async (req, res, next) => {
+//   try {
+//     const eventos = await Evento.find({ status: "draft" });
+//     return res.json(eventos);
+//   } catch (error) {
+//     return next(error);
+//   }
+// };
 //recoge solo eventos desde fecha actual
 const getEventosDesdeHoy = async (req, res, next) => {
   try {
-    
-
     const hoy = DateTime.now().setZone(ZONA).startOf("day").toUTC().toJSDate();
 
     const eventos = await Evento.find({
@@ -192,7 +190,7 @@ const sendCorreos = async (usuarios, eventos, tipoCorreo) => {
 const sendEventosSemanales = async () => {
   try {
     const semanal = true;
-   const hoy = DateTime.now().setZone(ZONA).startOf("day");
+    const hoy = DateTime.now().setZone(ZONA).startOf("day");
 
     const fechaInicio = hoy.toUTC().toJSDate();
     const fechaFin = hoy.plus({ days: 6 }).endOf("day").toUTC().toJSDate();
@@ -387,23 +385,18 @@ const deleteEvento = async (req, res, next) => {
 
 //actualiza un evento de la BBDD
 const updateEvento = async (req, res, next) => {
+ 
   try {
-    // if (!req.body.title || !req.body.artist  || !req.body.content || !req.body.site || !req.body.date_start){
-    //   return res.status(400).json({message: "Faltan campos obligatorios"});
-    // }
-
     const { idEvento } = req.params;
-    if (req.file) {
-      const oldEvento = await Evento.findById(idEvento);
-      if (oldEvento.image) {
-        deleteImg(oldEvento.image);
-      }
-      req.body.image = req.file.path;
-    }
-
     let eventoToUpdate = await Evento.findById(idEvento);
     if (!eventoToUpdate) {
       return res.status(404).json({ message: "Evento no encontrado" });
+    }
+    if (req.file) {
+      if (eventoToUpdate.image) {
+        deleteImg(eventoToUpdate.image);
+      }
+      req.body.image = req.file.path;
     }
 
     eventoToUpdate = new Evento(req.body);
@@ -446,7 +439,7 @@ const sendCorreccion = async (req, res, next) => {
 module.exports = {
   getAllEventos,
   getEventosDesdeHoy,
-  getDraftEventos,
+
   getEventosEntreFechas,
   getEventosParaCalendar,
   sendEventosSemanales,

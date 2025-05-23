@@ -31,10 +31,12 @@ startCronJobs()
 const eventoRoutes = require("./src/api/evento/evento.routes");
 const usuarioRoutes = require("./src/api/usuario/usuario.routes");
 const comentarioRoutes = require("./src/api/comentario/comentario.routes");
+const borradorRoutes = require("./src/api/borrador/borrador.routes");
 
 
 app.use("/usuario", usuarioRoutes);
 app.use("/evento", eventoRoutes);
+app.use("/borrador", borradorRoutes);
 app.use("/comentario", comentarioRoutes);
 
 app.get("/", (req, res) => {
