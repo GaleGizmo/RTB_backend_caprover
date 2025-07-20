@@ -9,6 +9,7 @@ const PORT = process.env.PORT;
 const jwt = require('jsonwebtoken');
 const db = require("./src/utils/db.js");
 const http = require("http");
+const path = require('path');
 
 db.connectDB();
 
@@ -27,6 +28,10 @@ app.use(express.urlencoded({ extended: true }));
 
 startCronJobs()
 
+
+
+app.use(express.static(path.join(__dirname, 'eventos_html')));
+
 //Rutas principales
 const eventoRoutes = require("./src/api/evento/evento.routes");
 const usuarioRoutes = require("./src/api/usuario/usuario.routes");
@@ -41,6 +46,16 @@ app.use("/comentario", comentarioRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json("Working");
+});
+
+app.get('/html/:shortURL', (req, res, next) => {
+  const shortURL = req.params.shortURL;
+  const filePath = path.join(__dirname, 'eventos_html', `${shortURL}.html`);
+  if (require('fs').existsSync(filePath)) {
+    res.sendFile(filePath);
+  } else {
+    next();
+  }
 });
 
 app.use("*", (req, res) => {
