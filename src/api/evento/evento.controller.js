@@ -5,6 +5,7 @@ const {
   enviarCorreccionEvento,
   enviarReminderEventos,
 } = require("../../utils/email");
+const { generarHtmlEvento } = require("../../utils/generarHtmlEvento");
 const { DateTime } = require("luxon");
 const User = require("../usuario/usuario.model");
 const Evento = require("./evento.model");
@@ -20,15 +21,7 @@ const getAllEventos = async (req, res, next) => {
     return next(error);
   }
 };
-// const getDraftEventos = async (req, res, next) => {
-//   try {
-//     const eventos = await Evento.find({ status: "draft" });
-//     return res.json(eventos);
-//   } catch (error) {
-//     return next(error);
-//   }
-// };
-//recoge solo eventos desde fecha actual
+
 const getEventosDesdeHoy = async (req, res, next) => {
   try {
     const hoy = DateTime.now().setZone(ZONA).startOf("day").toUTC().toJSDate();
@@ -341,6 +334,8 @@ const setEvento = async (req, res, next) => {
     }
     await newEvento.save();
 
+    // Genera el HTML del evento
+    generarHtmlEvento(newEvento);
     return res.status(200).json({ message: "Evento creado con éxito" });
   } catch (error) {
     error.message = "Erro ao crear evento";

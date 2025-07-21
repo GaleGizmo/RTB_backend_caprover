@@ -33,7 +33,7 @@ async function generarHtmlEventos() {
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://rockthebarrio.es/html/${
     evento.shortURL
-  }">
+  }.html">
   <meta http-equiv="refresh" content="0; url=https://rockthebarrio.es/${
     evento.shortURL
   }" />
