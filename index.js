@@ -48,7 +48,7 @@ app.get("/", (req, res) => {
   res.status(200).json("Working");
 });
 
-app.get('/html/:shortURL', (req, res, next) => {
+app.get('/html/:shortURL.html', (req, res, next) => {
   const shortURL = req.params.shortURL;
   const filePath = path.join(__dirname, 'eventos_html', `${shortURL}.html`);
   if (require('fs').existsSync(filePath)) {
