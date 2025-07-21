@@ -91,7 +91,7 @@ function startServer(port, callback) {
     }
   });
 
-  server.listen(port, () => {
+  server.listen(port, '0.0.0.0', () => {
     console.log(`Servidor iniciado correctamente en el puerto ${port}`);
     if (callback) callback(null, port, server);
   });
