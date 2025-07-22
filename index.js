@@ -30,33 +30,27 @@ startCronJobs()
 
 
 
-app.use(express.static(path.join(__dirname, 'eventos_html')));
+
 
 //Rutas principales
 const eventoRoutes = require("./src/api/evento/evento.routes");
 const usuarioRoutes = require("./src/api/usuario/usuario.routes");
 const comentarioRoutes = require("./src/api/comentario/comentario.routes");
 const borradorRoutes = require("./src/api/borrador/borrador.routes");
+const shareRoutes = require("./src/api/share/share.routes");
 
 
 app.use("/usuario", usuarioRoutes);
 app.use("/evento", eventoRoutes);
 app.use("/borrador", borradorRoutes);
 app.use("/comentario", comentarioRoutes);
+app.use("/share", shareRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json("Working");
 });
 
-app.get('/html/:shortURL.html', (req, res, next) => {
-  const shortURL = req.params.shortURL;
-  const filePath = path.join(__dirname, 'eventos_html', `${shortURL}.html`);
-  if (require('fs').existsSync(filePath)) {
-    res.sendFile(filePath);
-  } else {
-    next();
-  }
-});
+
 
 app.use("*", (req, res) => {
   return res.status(404).json("Route not found");
