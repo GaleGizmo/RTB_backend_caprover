@@ -11,7 +11,7 @@ const isSocialBot = (userAgent = "") => {
 router.get("/:shortURL", async (req, res) => {
   const { shortURL } = req.params;
   const userAgent = req.headers["user-agent"] || "";
-  console.log("User-Agent recibido:", userAgent);
+  console.log("<--User-Agent recibido:", userAgent, "-->");
   try {
     const evento = await Evento.findOne({ shortURL });
 
@@ -25,6 +25,7 @@ router.get("/:shortURL", async (req, res) => {
     const description = evento.artist + " en " + evento.site;
 
     const isBot = isSocialBot(userAgent);
+    console.log("Bot detectado:", isBot);
 
     const html = `
       <!DOCTYPE html>
