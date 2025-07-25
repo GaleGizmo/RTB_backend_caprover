@@ -1,21 +1,35 @@
-// src/api/share/share.routes.js
 const express = require("express");
 const router = express.Router();
 const Evento = require("../evento/evento.model");
 
+const isSocialBot = (userAgent = "") => {
+  const bots = [
+    "facebookexternalhit",
+    "Facebot",
+    "Twitterbot",
+    "LinkedInBot",
+    "Slackbot",
+    "Discordbot"
+  ];
+  return bots.some(bot => userAgent.includes(bot));
+};
+
 router.get("/:shortURL", async (req, res) => {
- const { shortURL } = req.params;
+  const { shortURL } = req.params;
+  const userAgent = req.headers["user-agent"] || "";
 
   try {
-     const evento = await Evento.findOne({ shortURL });
+    const evento = await Evento.findOne({ shortURL });
 
     if (!evento) {
       return res.status(404).send("Evento no encontrado");
     }
 
     const frontendURL = `https://www.rockthebarrio.es/${evento.shortURL}`;
-    const image = evento.image || "https://www.rockthebarrio.es/logo.jpg";
-    const description = evento.artist + " en " + evento.site 
+    const image = evento.image || "https://www.rockthebarrio.es/assets/no-image.jpg";
+    const description = evento.artist + " en " + evento.site;
+
+    const isBot = isSocialBot(userAgent);
 
     const html = `
       <!DOCTYPE html>
@@ -28,14 +42,23 @@ router.get("/:shortURL", async (req, res) => {
           <meta property="og:description" content="${description}" />
           <meta property="og:image" content="${image}" />
           <meta property="og:url" content="${frontendURL}" />
-          <meta http-equiv="refresh" content="1; url=${frontendURL}" />
+          <meta name="twitter:card" content="summary_large_image" />
+          ${!isBot ? `<meta http-equiv="refresh" content="1; url=${frontendURL}" />` : ""}
         </head>
         <body>
-          <p>Redirigiendo a <a href="${frontendURL}">${frontendURL}</a></p>
+          ${
+            isBot
+              ? `<h1>${evento.title}</h1><p>Vista previa generada para bots sociales</p>`
+              : `<p>Redirigiendo a <a href="${frontendURL}">${frontendURL}</a></p>
+                 <noscript><p><a href="${frontendURL}">Ver evento</a></p></noscript>`
+          }
         </body>
       </html>
     `;
 
+    res.set("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.set("Pragma", "no-cache");
+    res.set("Expires", "0");
     res.send(html);
   } catch (err) {
     console.error(err);
