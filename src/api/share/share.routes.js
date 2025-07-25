@@ -3,21 +3,15 @@ const router = express.Router();
 const Evento = require("../evento/evento.model");
 
 const isSocialBot = (userAgent = "") => {
-  const bots = [
-    "facebookexternalhit",
-    "Facebot",
-    "Twitterbot",
-    "LinkedInBot",
-    "Slackbot",
-    "Discordbot"
-  ];
-  return bots.some(bot => userAgent.includes(bot));
+  return /facebook|facebot|twitter|linkedin|slack|discord|pinterest|bot|crawler/i.test(
+    userAgent
+  );
 };
 
 router.get("/:shortURL", async (req, res) => {
   const { shortURL } = req.params;
   const userAgent = req.headers["user-agent"] || "";
-
+  console.log("User-Agent recibido:", userAgent);
   try {
     const evento = await Evento.findOne({ shortURL });
 
@@ -26,7 +20,8 @@ router.get("/:shortURL", async (req, res) => {
     }
 
     const frontendURL = `https://www.rockthebarrio.es/${evento.shortURL}`;
-    const image = evento.image || "https://www.rockthebarrio.es/assets/no-image.jpg";
+    const image =
+      evento.image || "https://www.rockthebarrio.es/assets/no-image.jpg";
     const description = evento.artist + " en " + evento.site;
 
     const isBot = isSocialBot(userAgent);
@@ -43,7 +38,11 @@ router.get("/:shortURL", async (req, res) => {
           <meta property="og:image" content="${image}" />
           <meta property="og:url" content="${frontendURL}" />
           <meta name="twitter:card" content="summary_large_image" />
-          ${!isBot ? `<meta http-equiv="refresh" content="1; url=${frontendURL}" />` : ""}
+          ${
+            !isBot
+              ? `<meta http-equiv="refresh" content="1; url=${frontendURL}" />`
+              : ""
+          }
         </head>
         <body>
           ${
