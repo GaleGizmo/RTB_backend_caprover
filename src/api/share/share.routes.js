@@ -20,8 +20,8 @@ router.get("/:shortURL", async (req, res) => {
     }
 
     const frontendURL = `https://www.rockthebarrio.es/${evento.shortURL}`;
-    const image =
-      evento.image || "https://www.rockthebarrio.es/assets/no-image.jpg";
+    const image = evento.image?.startsWith("http") ? evento.image : "https://www.rockthebarrio.es/assets/no-image.jpg";
+
     const description = evento.artist + " en " + evento.site;
 
     const isBot = isSocialBot(userAgent);
@@ -54,7 +54,7 @@ router.get("/:shortURL", async (req, res) => {
         </body>
       </html>
     `;
-
+    res.set("Content-Type", "text/html; charset=utf-8");
     res.set("Cache-Control", "no-cache, no-store, must-revalidate");
     res.set("Pragma", "no-cache");
     res.set("Expires", "0");
