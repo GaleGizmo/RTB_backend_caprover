@@ -3,9 +3,9 @@ const festivalRoutes = express.Router();
 
 const { getFestivalEventos, createFestival, getFestivalById, festivalesToDisplay } = require("./festival.controller.js");
 
-festivalRoutes.get("/:id", getFestivalById);
-festivalRoutes.get("/:id/eventos", getFestivalEventos);
-festivalRoutes.post("/", createFestival);
+festivalRoutes.get("/getFestival/:id", getFestivalById);
+festivalRoutes.get("/getFestivalEventos/:id", getFestivalEventos);
+festivalRoutes.post("/createFestival", createFestival);
 festivalRoutes.get("/toDisplay", festivalesToDisplay);
 
 module.exports = festivalRoutes;
