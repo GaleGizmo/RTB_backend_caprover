@@ -10,6 +10,7 @@ const { DateTime } = require("luxon");
 const User = require("../usuario/usuario.model");
 const Evento = require("./evento.model");
 const { nanoid } = require("nanoid");
+const { addEventoToFestival } = require("../festival/festival.controller");
 const ZONA = "Europe/Madrid";
 //recoge todos los eventos de la BBDD
 const getAllEventos = async (req, res, next) => {
@@ -305,6 +306,7 @@ const setEvento = async (req, res, next) => {
       genre,
       status,
       highlighted,
+      festival,
     } = req.body;
 
     const shortURL = await generateUniqueShortUrl();
@@ -328,14 +330,16 @@ const setEvento = async (req, res, next) => {
       highlighted,
       shortURL,
       timestamp,
+      festival,
     });
     if (req.file) {
       newEvento.image = req.file.path;
     }
+    if (newEvento.festival) {
+      addEventoToFestival(newEvento.festival, newEvento._id);
+    }
     await newEvento.save();
 
-    // Genera el HTML del evento
-    generarHtmlEvento(newEvento);
     return res.status(200).json({ message: "Evento creado con éxito" });
   } catch (error) {
     error.message = "Erro ao crear evento";
@@ -380,7 +384,6 @@ const deleteEvento = async (req, res, next) => {
 
 //actualiza un evento de la BBDD
 const updateEvento = async (req, res, next) => {
- 
   try {
     const { idEvento } = req.params;
     let eventoToUpdate = await Evento.findById(idEvento);

@@ -10,7 +10,6 @@ const EventoSchema = new mongoose.Schema(
     price: { type: Number,  required: true  },
     payWhatYouWant: {type: Boolean, default:false},
     date_start: { type: Date, required: true },
-    date_end: { type: Date},
     buy_ticket: {type: String},
     url: { type: String },
     image: { type: String },
@@ -19,7 +18,8 @@ const EventoSchema = new mongoose.Schema(
     status: {type: String},
     highlighted: {type: Boolean, default:false},
     commentsCount: { type: Number, default: 0 },
-    shortURL: {type: String, unique:true}
+    shortURL: {type: String, unique:true},
+    festival: { type: mongoose.Schema.Types.ObjectId, ref: "festival" }
   },
   {
     timestamps: true,
