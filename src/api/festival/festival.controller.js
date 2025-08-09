@@ -15,6 +15,27 @@ const getFestivalById = async (req, res, next) => {
   }
 };
 
+const festivalesToDisplay = async (req, res, next) => {
+ try {
+    const festivalDestacado = await Festival.findOne({ toBeFeatured: true }).lean();
+
+    if (festivalDestacado) {
+      return res.status(200).json({
+        isFestivalToDisplay: true,
+        festivalId: festivalDestacado._id
+      });
+    }
+
+    return res.status(200).json({
+      isFestivalToDisplay: false,
+      festivalId: null
+    });
+  } catch (error) {
+    console.error("Error fetching festivales:", error);
+    return next(error);
+  }
+};
+
 const getFestivalEventos = async (req, res, next) => {
   try {
     const festivalId = req.params.id;
@@ -73,4 +94,5 @@ module.exports = {
   createFestival,
   addEventoToFestival,
   getFestivalById,
+  festivalesToDisplay,
 };
