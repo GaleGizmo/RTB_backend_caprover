@@ -15,9 +15,22 @@ const ZONA = "Europe/Madrid";
 //recoge todos los eventos de la BBDD
 const getAllEventos = async (req, res, next) => {
   try {
-    const eventos = await Evento.find({ status: { $ne: "draft" } });
-    eventos.sort((a, b) => a.date_start - b.date_start);
-    return res.json(eventos);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const total = await Evento.countDocuments({ status: { $ne: "draft" } });
+    const eventos = await Evento.find({ status: { $ne: "draft" } })
+      .sort({ date_start: 1 })
+      .skip(skip)
+      .limit(limit);
+
+    return res.json({
+      eventos,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (error) {
     return next(error);
   }
@@ -25,20 +38,29 @@ const getAllEventos = async (req, res, next) => {
 
 const getEventosDesdeHoy = async (req, res, next) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
     const hoy = DateTime.now().setZone(ZONA).startOf("day").toUTC().toJSDate();
 
-    const eventos = await Evento.find({
+    const filter = {
       date_start: { $gte: hoy },
       status: { $ne: "draft" },
-    });
+    };
 
-    eventos.sort((a, b) => {
-      if (a.highlighted && !b.highlighted) return -1;
-      if (!a.highlighted && b.highlighted) return 1;
-      return a.date_start - b.date_start;
-    });
+    const total = await Evento.countDocuments(filter);
+    const eventos = await Evento.find(filter)
+      .sort({ highlighted: -1, date_start: 1 })
+      .skip(skip)
+      .limit(limit);
 
-    return res.json(eventos);
+    return res.json({
+      eventos,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (error) {
     return next(error);
   }
@@ -59,37 +81,56 @@ const getEventosParaCalendar = async (req, res, next) => {
 
 const getEventosEntreFechas = async (req, res, next) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
     const { startDate, endDate } = req.body;
 
-    const eventos = await Evento.find({
+    const filter = {
       date_start: {
         $gte: startDate,
         $lte: endDate,
       },
       status: { $ne: "draft" },
-    });
-    eventos.sort((a, b) => a.date_start - b.date_start);
+    };
 
-    return res.json(eventos);
+    const total = await Evento.countDocuments(filter);
+    const eventos = await Evento.find(filter)
+      .sort({ date_start: 1 })
+      .skip(skip)
+      .limit(limit);
+
+    return res.json({
+      eventos,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (error) {
     return next(error);
   }
 };
 
 const getEventosProximosFavoritos = async () => {
-  const hoy = DateTime.now().setZone(ZONA).startOf("day");
+  const fechaActual = new Date();
+  const fechaUnaSemana = new Date();
+  const fechaManana = new Date();
 
-  const fechaManana = hoy.plus({ days: 1 });
-  const fechaUnaSemana = hoy.plus({ days: 6 });
+  fechaUnaSemana.setDate(fechaActual.getDate() + 6);
+  fechaUnaSemana.setHours(0, 0, 0, 0);
+
+  fechaManana.setDate(fechaActual.getDate() + 1);
+  fechaManana.setHours(0, 0, 0, 0);
 
   const eventosProximos = await Evento.find({
     $or: [
       {
         date_start: {
-          $gte: fechaManana.toUTC().toJSDate(),
-          $lt: fechaManana.plus({ days: 1 }).toUTC().toJSDate(),
+          $gte: fechaManana,
+          $lt: new Date(fechaManana.getTime() + 24 * 60 * 60 * 1000),
         },
-      },
+      }, // Eventos que ocurran mañana
       {
         date_start: {
           $gte: fechaUnaSemana.toUTC().toJSDate(),
