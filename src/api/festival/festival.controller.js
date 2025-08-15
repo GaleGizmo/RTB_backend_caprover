@@ -16,19 +16,21 @@ const getFestivalById = async (req, res, next) => {
 };
 
 const festivalesToDisplay = async (req, res, next) => {
- try {
-    const festivalDestacado = await Festival.findOne({ toBeFeatured: true }).lean();
+  try {
+    const festivalDestacado = await Festival.findOne({
+      toBeFeatured: true,
+    }).lean();
 
     if (festivalDestacado) {
       return res.status(200).json({
         isFestivalToDisplay: true,
-        festivalId: festivalDestacado._id
+        festivalId: festivalDestacado._id,
       });
     }
 
     return res.status(200).json({
       isFestivalToDisplay: false,
-      festivalId: null
+      festivalId: null,
     });
   } catch (error) {
     console.error("Error fetching festivales:", error);
@@ -89,10 +91,44 @@ const addEventoToFestival = async (festivalId, eventoId) => {
   }
 };
 
+const festivalDesactivado = async () => {
+  try {
+    const festivales = await Festival.find({ toBeFeatured: true }).populate(
+      "eventos"
+    );
+    const hoy = new Date();
+
+    const nombresDesactivados = [];
+    for (const festival of festivales) {
+      const eventos = festival.eventos;
+      // Si NO hay ningún evento igual o posterior a hoy, desactivar el festival
+      const tieneEventoFuturo = eventos.some(
+        (evento) => new Date(evento.date_start) >= hoy
+      );
+      if (!tieneEventoFuturo) {
+        festival.toBeFeatured = false;
+        await festival.save();
+        nombresDesactivados.push(festival.name);
+      }
+    }
+    if (nombresDesactivados.length === 0) {
+      console.log("Ningún festival desactivado.");
+      return [];
+    } else {
+      console.log(`Festivales desactivados: ${nombresDesactivados.join(", ")}`);
+      return nombresDesactivados;
+    }
+  } catch (error) {
+    console.error("Error al desactivar festivales:", error);
+    return error;
+  }
+};
+
 module.exports = {
   getFestivalEventos,
   createFestival,
   addEventoToFestival,
   getFestivalById,
   festivalesToDisplay,
+  festivalDesactivado,
 };
