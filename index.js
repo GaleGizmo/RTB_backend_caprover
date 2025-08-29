@@ -39,6 +39,7 @@ const comentarioRoutes = require("./src/api/comentario/comentario.routes");
 const borradorRoutes = require("./src/api/borrador/borrador.routes");
 const shareRoutes = require("./src/api/share/share.routes");
 const festivalRoutes = require("./src/api/festival/festival.routes");
+const localizacionRoutes = require("./src/api/localizaciones/localizacion.routes");
 
 
 app.use("/usuario", usuarioRoutes);
@@ -46,6 +47,7 @@ app.use("/evento", eventoRoutes);
 app.use("/borrador", borradorRoutes);
 app.use("/comentario", comentarioRoutes);
 app.use("/festival", festivalRoutes);
+app.use("/localizacion", localizacionRoutes);
 app.use("/share", shareRoutes);
 
 app.get("/", (req, res) => {

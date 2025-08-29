@@ -10,7 +10,7 @@ const {
   getEventoById,
   sendEventosSemanalesHandler,
   remindEventosHandler,
-  sendEventosDiariosHandler,
+  updateSiteField,
   getEventosDesdeHoy,
   getEventosParaCalendar,
   getEventosEntreFechas,
@@ -18,14 +18,11 @@ const {
  
   sendCorreccion,
 } = require("./evento.controller.js");
-const {
-  checkEventMandatoryFields,
-} = require("../../middleware/checkfields.js");
+
 const upload = require("../../middleware/img.js");
 
 eventoRoutes.get("/", getAllEventos);
 eventoRoutes.get("/eventosDesdeHoy", getEventosDesdeHoy);
-// eventoRoutes.get("/drafts", [isAdmin], getDraftEventos);
 eventoRoutes.get("/eventosParaCalendar", getEventosParaCalendar);
 eventoRoutes.post("/eventosEntreFechas", getEventosEntreFechas);
 eventoRoutes.get("/getbyid/:idEvento", getEventoById);
@@ -36,5 +33,6 @@ eventoRoutes.get("/remindEvento", remindEventosHandler);
 eventoRoutes.get("/sendEventosDiarios", sendEventosDiarios);
 eventoRoutes.delete("/:idEvento", [isAdmin], deleteEvento);
 eventoRoutes.post("/correccion", [isAdmin], sendCorreccion);
+eventoRoutes.post("/updateSiteField", isAdmin, updateSiteField);
 
 module.exports = eventoRoutes;

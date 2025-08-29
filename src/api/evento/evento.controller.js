@@ -5,7 +5,7 @@ const {
   enviarCorreccionEvento,
   enviarReminderEventos,
 } = require("../../utils/email");
-const { generarHtmlEvento } = require("../../utils/generarHtmlEvento");
+
 const { DateTime } = require("luxon");
 const User = require("../usuario/usuario.model");
 const Evento = require("./evento.model");
@@ -15,7 +15,9 @@ const ZONA = "Europe/Madrid";
 //recoge todos los eventos de la BBDD
 const getAllEventos = async (req, res, next) => {
   try {
-    const eventos = await Evento.find({ status: { $ne: "draft" } });
+    const eventos = await Evento.find({ status: { $ne: "draft" } }).populate(
+      "location"
+    );
     eventos.sort((a, b) => a.date_start - b.date_start);
     return res.json(eventos);
   } catch (error) {
@@ -30,7 +32,7 @@ const getEventosDesdeHoy = async (req, res, next) => {
     const eventos = await Evento.find({
       date_start: { $gte: hoy },
       status: { $ne: "draft" },
-    });
+    }).populate("location");
 
     eventos.sort((a, b) => {
       if (a.highlighted && !b.highlighted) return -1;
@@ -67,7 +69,7 @@ const getEventosEntreFechas = async (req, res, next) => {
         $lte: endDate,
       },
       status: { $ne: "draft" },
-    });
+    }).populate("location");
     eventos.sort((a, b) => a.date_start - b.date_start);
 
     return res.json(eventos);
@@ -98,7 +100,7 @@ const getEventosProximosFavoritos = async () => {
       },
     ],
     status: { $nin: ["cancelled", "draft"] }, //descarta los que se hayan cancelado y los borradores
-  });
+  }).populate("location");
   return eventosProximos;
 };
 
@@ -151,7 +153,9 @@ const getEventosAEnviar = async (fechaInicio, fechaFin, field) => {
     const query = {};
     query[field] = { $gte: fechaInicio, $lt: fechaFin };
     const eventosExcluidos = ["cancelled", "soldout", "draft"];
-    const eventos = await Evento.find(query).sort({ date_start: 1 });
+    const eventos = await Evento.find(query)
+      .populate("location")
+      .sort({ date_start: 1 });
     //Evita mandar en los eventos diarios los que se añadieran y tuvieran lugar el día anterior
     if (field === "createdAt") {
       const eventosExceptoLosDeAyer = eventos.filter(
@@ -276,10 +280,12 @@ const getEventoById = async (req, res, next) => {
     let evento;
     if (idEvento.length === 4) {
       // Verifica si el parámetro es un shortURL
-      evento = await Evento.findOne({ shortURL: idEvento });
+      evento = await Evento.findOne({ shortURL: idEvento }).populate(
+        "location"
+      );
     } else {
       // Si no, asume que es un evento_id
-      evento = await Evento.findById(idEvento);
+      evento = await Evento.findById(idEvento).populate("location");
     }
     return res.status(200).json(evento);
   } catch (error) {
@@ -434,10 +440,55 @@ const sendCorreccion = async (req, res, next) => {
   }
 };
 
+const updateSiteField = async (req, res, next) => {
+  try {
+    // 1. Obtener todas las localizaciones y crear el array A con name e id
+    const Localizacion = require("../localizaciones/localizacion.model");
+    const localizaciones = await Localizacion.find({}, "name _id");
+    const arrayConNameId = localizaciones.map((loc) => ({ name: loc.name, id: loc._id }));
+
+    // 2. Obtener todos los eventos
+    const eventos = await Evento.find({});
+    let actualizados = 0;
+    let eventosActualizados = [];
+
+    for (const evento of eventos) {
+      // 3. Buscar coincidencia entre la parte de evento.site antes de la primera coma y name de A (case insensitive, ignorando acentos)
+      if (evento.site && typeof evento.site === "string") {
+        const normalize = (str) =>
+          str
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase();
+        const sitePart = normalize(evento.site.split(",")[0].trim());
+        const locMatch = arrayConNameId.find((loc) =>
+          sitePart.includes(normalize(loc.name))
+        );
+        if (locMatch) {
+          // 4. Asignar location
+          evento.location = locMatch.id;
+
+          await evento.save();
+          actualizados++;
+          eventosActualizados.push(evento._id);
+        }
+      }
+    }
+
+    return res.status(200).json({
+      message: `Migración completada. Actualizados ${actualizados} eventos`,
+      eventosActualizados,
+    });
+  } catch (error) {
+    console.error("Error al migrar campo site:", error);
+    return next(error);
+  }
+};
+
 module.exports = {
   getAllEventos,
   getEventosDesdeHoy,
-
+  updateSiteField,
   getEventosEntreFechas,
   getEventosParaCalendar,
   sendEventosSemanales,
