@@ -301,11 +301,11 @@ const setEvento = async (req, res, next) => {
       content,
       user_creator,
       site,
+      location,
       payWhatYouWant,
       price,
       buy_ticket,
       date_start,
-      date_end,
       url,
       image,
       youtubeVideoId,
@@ -323,11 +323,11 @@ const setEvento = async (req, res, next) => {
       content,
       user_creator,
       site,
+      location,
       price,
       payWhatYouWant,
       buy_ticket,
       date_start,
-      date_end,
       url,
       image,
       youtubeVideoId,
@@ -346,7 +346,7 @@ const setEvento = async (req, res, next) => {
     }
     await newEvento.save();
 
-    return res.status(200).json({ message: "Evento creado con éxito" });
+    return res.status(200).json({ message: "Evento creado con éxito", evento: newEvento });
   } catch (error) {
     error.message = "Erro ao crear evento";
     return next(error);
@@ -445,7 +445,10 @@ const updateSiteField = async (req, res, next) => {
     // 1. Obtener todas las localizaciones y crear el array A con name e id
     const Localizacion = require("../localizaciones/localizacion.model");
     const localizaciones = await Localizacion.find({}, "name _id");
-    const arrayConNameId = localizaciones.map((loc) => ({ name: loc.name, id: loc._id }));
+    const arrayConNameId = localizaciones.map((loc) => ({
+      name: loc.name,
+      id: loc._id,
+    }));
 
     // 2. Obtener todos los eventos
     const eventos = await Evento.find({});

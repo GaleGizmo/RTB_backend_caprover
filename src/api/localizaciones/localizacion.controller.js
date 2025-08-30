@@ -4,7 +4,10 @@ require("dotenv").config();
 const getLocalizaciones = async (req, res, next) => {
   try {
     const localizaciones = await Localizacion.find();
-    res.status(200).json(localizaciones);
+    const sortedLocalizaciones = localizaciones.sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+    res.status(200).json(sortedLocalizaciones);
   } catch (error) {
     console.error("Error al obtener localizaciones:", error);
     next(error);
@@ -14,7 +17,7 @@ const getLocalizaciones = async (req, res, next) => {
 const addLocalizacion = async (req, res) => {
   try {
     const { direccion } = req.body;
-
+    
     if (!direccion) {
       return res.status(400).json({ error: "La dirección es obligatoria" });
     }
@@ -52,7 +55,7 @@ const addLocalizacion = async (req, res) => {
     await nuevaLocalizacion.save();
 
     return res.status(201).json({
-      message: "Localización creada correctamente",
+      message: "Localización creada correctamente!",
       localizacion: nuevaLocalizacion,
     });
   } catch (error) {
