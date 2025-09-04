@@ -496,6 +496,5 @@ module.exports = {
   sendEventosSemanalesHandler,
   remindEventosHandler,
   sendEventosDiarios,
-  sendEventosDiariosHandler,
   sendCorreccion,
 };
