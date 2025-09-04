@@ -30,7 +30,7 @@ eventoRoutes.put("/:idEvento", [isAdmin], upload.single("image"), updateEvento);
 eventoRoutes.post("/", [isAdmin], upload.single("image"), setEvento);
 eventoRoutes.get("/sendEventosSemanales", sendEventosSemanalesHandler);
 eventoRoutes.get("/remindEvento", remindEventosHandler);
-eventoRoutes.get("/sendEventosDiarios", sendEventosDiarios);
+eventoRoutes.get("/sendEventosDiarios", [isAdmin], sendEventosDiarios);
 eventoRoutes.delete("/:idEvento", [isAdmin], deleteEvento);
 eventoRoutes.post("/correccion", [isAdmin], sendCorreccion);
 eventoRoutes.post("/updateSiteField", isAdmin, updateSiteField);

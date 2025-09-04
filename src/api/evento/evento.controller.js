@@ -250,14 +250,7 @@ const sendEventosDiarios = async (req, res, next) => {
     return next(error);
   }
 };
-const sendEventosDiariosHandler = async (req, res) => {
-  try {
-    await sendEventosDiarios();
-    res.status(200).send({ message: "Eventos de hoy enviados con éxito" });
-  } catch (error) {
-    res.status(500).send({ error: "Error al enviar eventos de hoy" });
-  }
-};
+
 async function generateUniqueShortUrl() {
   let unique = false;
   let shortUrl;

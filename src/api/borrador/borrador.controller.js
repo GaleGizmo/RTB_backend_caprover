@@ -25,7 +25,7 @@ const setBorrador = async (req, res, next) => {
 const getBorradorById = async (req, res, next) => {
     try {
         const idBorrador = req.params.idBorrador;
-        const borrador = await Borrador.findById(idBorrador);
+        const borrador = await Borrador.findById(idBorrador).populate('location');
         if (!borrador) {
             return res.status(404).json({ message: "Borrador non atopado" });
         }
@@ -38,7 +38,7 @@ const getBorradorById = async (req, res, next) => {
 
 const getAllBorradores = async (req, res, next) => {
     try {
-        const borradores = await Borrador.find();
+        const borradores = await Borrador.find().populate('location');
         res.status(200).json(borradores);
     } catch (error) {
         console.error("Erro ao obter os borradores:", error);
