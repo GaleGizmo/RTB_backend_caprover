@@ -78,7 +78,7 @@ const enviarCorreoEventos = async (destinatario, eventos, semanal) => {
       tipoEventos = "<h2><u>Últimos eventos engadidos</u></h2>";
       unsubscribe = "unsubscribenewevent";
       emailSubject = "Novos eventos";
-      avisoSemanal="<p></p>"
+      avisoSemanal = "<p></p>";
     }
     const contenido = `
      <div style="display: block; width: 100%; text-align:center;"> <p>Ola, ${destinatario.username}!</p>
@@ -89,6 +89,7 @@ const enviarCorreoEventos = async (destinatario, eventos, semanal) => {
       <p style="font-size: 10px; color: #555;">Para deixar de recibir este correo preme <a href="https://www.rockthebarrio.es/reset-password/${unsubscribe}"> aquí</a>.</p>
       <p style="font-size: 10px; color: #555;">Podes ver aquí os <a href="https://www.rockthebarrio.es/terminos"> Termos e Condicións </a> e a nosa <a href="https://www.rockthebarrio.es/privacidad"> Política de Privacidade</a>.</p>
       </div>`;
+
     const mensaje = {
       from: " Rock The Barrio <rockthebarrio@gmail.com>",
       to: destinatario.email,
@@ -96,7 +97,7 @@ const enviarCorreoEventos = async (destinatario, eventos, semanal) => {
       html: contenido,
     };
     const respuesta = await transporter.sendMail(mensaje);
-    console.log("Correo electrónico enviado:", respuesta);
+   
   } catch (error) {
     console.error(
       "Error al enviar el correo electrónico a:",
@@ -131,7 +132,7 @@ const enviarReminderEventos = async (evento, usuario) => {
     };
 
     const respuesta = await transporter.sendMail(mensaje);
-    console.log("Correo electrónico enviado:", respuesta);
+
   } catch (error) {
     console.error("Error al enviar el correo electrónico:", error);
   }
@@ -156,12 +157,12 @@ const enviarCorreoRecuperacion = async (destinatario, token) => {
     };
 
     const respuesta = await transporter.sendMail(mensaje);
-    console.log("Correo electrónico enviado:", respuesta);
+  
   } catch (error) {
     console.error("Error al enviar el correo electrónico:", error);
   }
 };
-const enviarCorreccionEvento = async (user, evento, mensaje, asunto) =>{
+const enviarCorreccionEvento = async (user, evento, mensaje, asunto) => {
   try {
     const transporter = await createTransporter();
     const contenido = `
@@ -173,7 +174,7 @@ const enviarCorreccionEvento = async (user, evento, mensaje, asunto) =>{
       <p style="font-size: 10px; color: #555;">Podes ver aquí os <a href="https://rock-the-barrio-front-one.vercel.app/terminos"> Termos e Condicións </a> e a nosa <a href="https://rock-the-barrio-front-one.vercel.app/privacidad"> Política de Privacidade</a>.</p>
       </div>`;
     const email = {
-      from: ' Rock The Barrio <rockthebarrio@gmail.com>',
+      from: " Rock The Barrio <rockthebarrio@gmail.com>",
       to: user.email,
       subject: asunto,
       html: contenido,
@@ -184,7 +185,7 @@ const enviarCorreccionEvento = async (user, evento, mensaje, asunto) =>{
     console.error("Error al enviar el correo electrónico:", error);
     throw new Error("No se pudo enviar el correo electrónico.");
   }
-}
+};
 const enviarMensajeDeUsuario = async (
   asunto,
   nombreDeUsuario,
@@ -209,7 +210,7 @@ const enviarMensajeDeUsuario = async (
       html: contenido,
     };
     const respuesta = await transporter.sendMail(email);
-    console.log("Correo electrónico enviado:", respuesta);
+   
   } catch (error) {
     console.error("Error al enviar el correo electrónico:", error);
     throw new Error("No se pudo enviar el correo electrónico.");

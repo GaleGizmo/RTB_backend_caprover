@@ -288,48 +288,17 @@ const getEventoById = async (req, res, next) => {
 //añade un evento a la BBDD
 const setEvento = async (req, res, next) => {
   try {
-    const {
-      title,
-      artist,
-      content,
-      user_creator,
-      site,
-      location,
-      payWhatYouWant,
-      price,
-      buy_ticket,
-      date_start,
-      url,
-      image,
-      youtubeVideoId,
-      genre,
-      status,
-      highlighted,
-      festival,
-    } = req.body;
-
+    let { location, ...rest } = req.body;
+    if (location === "") {
+      location = undefined;
+    }
     const shortURL = await generateUniqueShortUrl();
     const timestamp = new Date();
     const newEvento = new Evento({
-      title,
-      artist,
-      content,
-      user_creator,
-      site,
+      ...rest,
       location,
-      price,
-      payWhatYouWant,
-      buy_ticket,
-      date_start,
-      url,
-      image,
-      youtubeVideoId,
-      genre,
-      status,
-      highlighted,
       shortURL,
       timestamp,
-      festival,
     });
     if (req.file) {
       newEvento.image = req.file.path;
