@@ -51,7 +51,7 @@ const enviarCorreoEventos = async (destinatario, eventos, semanal) => {
       ];
 
       const nombreMes = mesesEnGallego[mes];
-      const lugar = evento.site.name;
+      const lugar = evento.site;
 
       eventosHTML += `
        <div style="font-family: Arial, sans-serif; margin: 10px auto ; width:70%;  border: 2px solid #000; border-radius: 10px; padding: 10px 20px; background-image:linear-gradient(to bottom, #f16704, #fff);  ">
@@ -112,7 +112,7 @@ const enviarReminderEventos = async (evento, usuario) => {
   try {
     const transporter = await createTransporter();
     const dia = evento.date_start.getDate();
-    const lugar = evento.site.name;
+    const lugar = evento.site;
     const mensaje = {
       from: " Rock The Barrio <rockthebarrio@gmail.com>",
       to: usuario.email,
