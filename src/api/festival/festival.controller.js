@@ -15,6 +15,20 @@ const getFestivalById = async (req, res, next) => {
   }
 };
 
+const getNextFestivals = async (req, res, next) => {
+  try {
+    const today = new Date();
+    const festivals = await Festival.find({
+      endDate: { $gte: today },
+    }).sort({ startDate: 1 });
+
+    return res.status(200).json(festivals);
+  } catch (error) {
+    console.error("Error fetching next festivals:", error);
+    return next(error);
+  }
+};
+
 const festivalesToDisplay = async (req, res, next) => {
   try {
     const festivalDestacado = await Festival.findOne({
@@ -131,4 +145,5 @@ module.exports = {
   getFestivalById,
   festivalesToDisplay,
   festivalDesactivado,
+  getNextFestivals,
 };
