@@ -97,7 +97,6 @@ const enviarCorreoEventos = async (destinatario, eventos, semanal) => {
       html: contenido,
     };
     const respuesta = await transporter.sendMail(mensaje);
-   
   } catch (error) {
     console.error(
       "Error al enviar el correo electrónico a:",
@@ -132,7 +131,6 @@ const enviarReminderEventos = async (evento, usuario) => {
     };
 
     const respuesta = await transporter.sendMail(mensaje);
-
   } catch (error) {
     console.error("Error al enviar el correo electrónico:", error);
   }
@@ -157,7 +155,6 @@ const enviarCorreoRecuperacion = async (destinatario, token) => {
     };
 
     const respuesta = await transporter.sendMail(mensaje);
-  
   } catch (error) {
     console.error("Error al enviar el correo electrónico:", error);
   }
@@ -168,10 +165,10 @@ const enviarCorreccionEvento = async (user, evento, mensaje, asunto) => {
     const contenido = `
      <div style="display: block; width: 100%; text-align:center;"> <p>Ola, ${user.username}!</p>
      <p>Por favor, toma nota da seguinte corrección:</p>
-     <p>Evento: <a href="https://rock-the-barrio-front-one.vercel.app/${evento._id}"> ${evento.title}</a></p>
+     <p>Evento: <a href="https://www.rockthebarrio.es/${evento._id}"> ${evento.title}</a></p>
       <p>Corrección: ${mensaje}</p>
       <p></p>
-      <p style="font-size: 10px; color: #555;">Podes ver aquí os <a href="https://rock-the-barrio-front-one.vercel.app/terminos"> Termos e Condicións </a> e a nosa <a href="https://rock-the-barrio-front-one.vercel.app/privacidad"> Política de Privacidade</a>.</p>
+      <p style="font-size: 10px; color: #555;">Podes ver aquí os <a href="https://www.rockthebarrio.es/terminos"> Termos e Condicións </a> e a nosa <a href="https://www.rockthebarrio.es/privacidad"> Política de Privacidade</a>.</p>
       </div>`;
     const email = {
       from: " Rock The Barrio <rockthebarrio@gmail.com>",
@@ -210,7 +207,6 @@ const enviarMensajeDeUsuario = async (
       html: contenido,
     };
     const respuesta = await transporter.sendMail(email);
-   
   } catch (error) {
     console.error("Error al enviar el correo electrónico:", error);
     throw new Error("No se pudo enviar el correo electrónico.");
