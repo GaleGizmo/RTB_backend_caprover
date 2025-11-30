@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const Usuario = require("./usuario.model");
 const { deleteImg } = require("../../middleware/deleteImg");
-const { enviarCorreoRecuperacion } = require("../../utils/email");
+const { enviarCorreoRecuperacion, enviarMensajeDeUsuario } = require("../../utils/email");
 const Evento = require("../evento/evento.model");
 const Comentario = require("../comentario/comentario.model")
 
