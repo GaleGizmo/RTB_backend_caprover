@@ -19,7 +19,6 @@ const connectDB = async () => {
   // Si no hay una promesa de conexión en curso, la creamos
   if (!cached.promise) {
     const opts = {
-      bufferCommands: false, // Deshabilita buffering para serverless
       maxPoolSize: 10, // Limita conexiones en el pool
     };
 

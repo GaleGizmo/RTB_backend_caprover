@@ -5,11 +5,9 @@ const cloudinary = require("cloudinary").v2;
 
 const PORT = process.env.PORT || 3000;
 const jwt = require('jsonwebtoken');
-const db = require("./src/utils/db.js");
+const { connectDB } = require("./src/utils/db.js");
 const http = require("http");
 const path = require('path');
-
-db.connectDB();
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -17,12 +15,21 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 
-
-
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Middleware para asegurar conexión a DB antes de cada request
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error("Error conectando a MongoDB:", error);
+    res.status(500).json({ error: "Database connection failed" });
+  }
+});
 
 // Solo iniciar cron jobs si NO estamos en Vercel (entorno serverless)
 if (!process.env.VERCEL) {
