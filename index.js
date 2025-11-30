@@ -1,11 +1,9 @@
 require("dotenv").config();
-const { CronJob } = require('cron');
 const express = require("express");
 const cors = require("cors");
-const { startCronJobs } = require("./src/cron/cronjobs.js");
 const cloudinary = require("cloudinary").v2;
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 const jwt = require('jsonwebtoken');
 const db = require("./src/utils/db.js");
 const http = require("http");
@@ -26,7 +24,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-startCronJobs()
+// Solo iniciar cron jobs si NO estamos en Vercel (entorno serverless)
+if (!process.env.VERCEL) {
+  const { startCronJobs } = require("./src/cron/cronjobs.js");
+  startCronJobs();
+}
 
 
 
@@ -95,7 +97,12 @@ function startServer(port, callback) {
   });
   return server
 }
-startServer(PORT)
-  
 
-module.exports = { startServer };
+// Solo iniciar servidor si NO estamos en Vercel
+if (!process.env.VERCEL) {
+  startServer(PORT);
+}
+
+// Exportar app para Vercel y startServer para otros entornos
+module.exports = app;
+module.exports.startServer = startServer;
