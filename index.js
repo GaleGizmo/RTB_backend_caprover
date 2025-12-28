@@ -49,6 +49,7 @@ const borradorRoutes = require("./src/api/borrador/borrador.routes");
 const shareRoutes = require("./src/api/share/share.routes");
 const festivalRoutes = require("./src/api/festival/festival.routes");
 const localizacionRoutes = require("./src/api/localizaciones/localizacion.routes");
+const sitemapRoutes = require("./src/api/sitemap/sitemap.routes");
 
 
 app.use("/usuario", usuarioRoutes);
@@ -58,6 +59,7 @@ app.use("/comentario", comentarioRoutes);
 app.use("/festival", festivalRoutes);
 app.use("/localizacion", localizacionRoutes);
 app.use("/share", shareRoutes);
+app.use("/", sitemapRoutes); // Sitemap en la raíz: /sitemap.xml
 
 app.get("/", (req, res) => {
   res.status(200).json("Working");
