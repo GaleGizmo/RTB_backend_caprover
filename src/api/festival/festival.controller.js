@@ -73,8 +73,8 @@ const getFestivalEventos = async (req, res, next) => {
 
 const createFestival = async (req, res, next) => {
   try {
-    const { name, description, image, startDate, endDate, toBeFeatured } =
-      req.body;
+    const { name, description, startDate, endDate, toBeFeatured } = req.body;
+    const image = req.file ? req.file.path : req.body.image;
     const newFestival = new Festival({
       name,
       description,

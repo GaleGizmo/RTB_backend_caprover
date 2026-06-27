@@ -64,4 +64,26 @@ const uploadToCloudinaryMiddleware = async (req, res, next) => {
   }
 };
 
-module.exports = { upload, uploadToCloudinaryMiddleware };
+/**
+ * Middleware que sube el archivo a Cloudinary con límite de alto (para logos)
+ */
+const uploadLogoToCloudinaryMiddleware = async (req, res, next) => {
+  try {
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer, {
+        folder: "rockthebarrio/festivals",
+        transformation: [
+          { height: 50, crop: "limit" },
+          { quality: "auto", fetch_format: "auto" },
+        ],
+      });
+      req.file.path = result.secure_url;
+      req.file.filename = result.public_id;
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { upload, uploadToCloudinaryMiddleware, uploadLogoToCloudinaryMiddleware };
