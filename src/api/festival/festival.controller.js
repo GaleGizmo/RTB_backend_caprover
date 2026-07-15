@@ -31,20 +31,20 @@ const getNextFestivals = async (req, res, next) => {
 
 const festivalesToDisplay = async (req, res, next) => {
   try {
-    const festivalDestacado = await Festival.findOne({
+    const festivalesDestacados = await Festival.find({
       toBeFeatured: true,
     }).lean();
 
-    if (festivalDestacado) {
+    if (festivalesDestacados.length > 0) {
       return res.status(200).json({
         isFestivalToDisplay: true,
-        festivalId: festivalDestacado._id,
+        festivalIds: festivalesDestacados.map((f) => f._id),
       });
     }
 
     return res.status(200).json({
       isFestivalToDisplay: false,
-      festivalId: null,
+      festivalIds: [],
     });
   } catch (error) {
     console.error("Error fetching festivales:", error);
