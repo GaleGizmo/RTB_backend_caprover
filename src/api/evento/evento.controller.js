@@ -16,7 +16,7 @@ const ZONA = "Europe/Madrid";
 const getAllEventos = async (req, res, next) => {
   try {
     const eventos = await Evento.find({ status: { $ne: "draft" } }).populate(
-      "location"
+      "location",
     );
     eventos.sort((a, b) => a.date_start - b.date_start);
     return res.json(eventos);
@@ -34,6 +34,7 @@ const getEventosDesdeHoy = async (req, res, next) => {
       status: { $ne: "draft" },
     }).populate("location");
 
+    // Los eventos destacados aparecen primero; entre iguales, orden cronológico
     eventos.sort((a, b) => {
       if (a.highlighted && !b.highlighted) return -1;
       if (!a.highlighted && b.highlighted) return 1;
@@ -46,11 +47,12 @@ const getEventosDesdeHoy = async (req, res, next) => {
   }
 };
 
+// Proyección mínima: solo los campos necesarios para renderizar el calendario y reducir payload
 const getEventosParaCalendar = async (req, res, next) => {
   try {
     const eventos = await Evento.find(
       { status: { $ne: "draft" } },
-      "_id title date_start"
+      "_id title date_start",
     );
 
     return res.json(eventos);
@@ -78,6 +80,9 @@ const getEventosEntreFechas = async (req, res, next) => {
   }
 };
 
+// Devuelve los eventos que ocurren mañana o en exactamente 6 días.
+// Se usa para enviar recordatorios a usuarios que tienen esos eventos en favoritos
+// con suficiente antelación (aviso a 1 día y a 1 semana vista).
 const getEventosProximosFavoritos = async () => {
   const hoy = DateTime.now().setZone(ZONA).startOf("day");
 
@@ -114,6 +119,10 @@ const remindEvento = async () => {
       });
 
       if (usuariosConEventoEnFavoritos.length > 0) {
+        // Se itera el cruce usuario×evento para enviar un correo personalizado
+        // por cada evento próximo que esté en favoritos de ese usuario concreto.
+        // La consulta previa filtra usuarios con al menos un favorito relevante
+        // pero no especifica cuáles, de ahí la comprobación explícita interior.
         for (const usuario of usuariosConEventoEnFavoritos) {
           for (const evento of eventosProximos) {
             if (usuario.favorites && usuario.favorites.includes(evento._id)) {
@@ -148,6 +157,11 @@ const remindEventosHandler = async (req, res) => {
   }
 };
 
+// Función reutilizada por el envío semanal y el diario.
+// - Modo semanal: field="date_start" → eventos cuya fecha de celebración cae en la ventana.
+// - Modo diario:  field="createdAt"  → eventos creados en las últimas ~24 h.
+//   En este modo se añade un filtro extra para descartar eventos cuya fecha de
+//   celebración ya ha pasado (creados pero celebrados ayer o antes).
 const getEventosAEnviar = async (fechaInicio, fechaFin, field) => {
   try {
     const query = {};
@@ -156,19 +170,19 @@ const getEventosAEnviar = async (fechaInicio, fechaFin, field) => {
     const eventos = await Evento.find(query)
       .populate("location")
       .sort({ date_start: 1 });
-    //Evita mandar en los eventos diarios los que se añadieran y tuvieran lugar el día anterior
+    // Evita mandar en los eventos diarios los que se añadieran y tuvieran lugar el día anterior
     if (field === "createdAt") {
       const eventosExceptoLosDeAyer = eventos.filter(
         (evento) =>
           evento.date_start > fechaFin &&
-          !eventosExcluidos.includes(evento.status)
+          !eventosExcluidos.includes(evento.status),
       );
 
       return eventosExceptoLosDeAyer;
     }
 
     const eventosActivos = eventos.filter(
-      (evento) => !eventosExcluidos.includes(evento.status)
+      (evento) => !eventosExcluidos.includes(evento.status),
     );
 
     return eventosActivos;
@@ -177,10 +191,11 @@ const getEventosAEnviar = async (fechaInicio, fechaFin, field) => {
   }
 };
 
+// Envío secuencial con pausa entre correos para evitar superar el límite de tasa del servidor SMTP
 const sendCorreos = async (usuarios, eventos, tipoCorreo) => {
   for (const usuario of usuarios) {
     await enviarCorreoEventos(usuario, eventos, tipoCorreo);
-    await new Promise((resolve) => setTimeout(resolve, 500)); // Esperar 1 segundo entre cada envío
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Esperar 500 ms entre cada envío
   }
 };
 
@@ -197,7 +212,7 @@ const sendEventosSemanales = async () => {
     const eventosSemana = await getEventosAEnviar(
       fechaInicio,
       fechaFin,
-      "date_start"
+      "date_start",
     );
     //busca usuarios que reciben la newsletter
     const usuarios = await User.find({ newsletter: true }, "email username");
@@ -217,6 +232,9 @@ const sendEventosSemanalesHandler = async (req, res) => {
     res.status(500).send({ error: "Error al enviar eventos semanales" });
   }
 };
+// Se ejecuta a las 16:00 h (hora de Madrid) mediante cron.
+// Captura los eventos creados en la ventana [ayer 16:00 – hoy 16:00],
+// asegurando que cada evento recién publicado se notifique exactamente una vez.
 const sendEventosDiarios = async (req, res, next) => {
   try {
     const semanal = false;
@@ -233,12 +251,12 @@ const sendEventosDiarios = async (req, res, next) => {
     const eventosDia = await getEventosAEnviar(
       fechaInicio,
       fechaFin,
-      "createdAt"
+      "createdAt",
     );
     if (eventosDia && eventosDia.length > 0) {
       const usuarios = await User.find(
         { newevent: true },
-        "email username"
+        "email username",
       ).lean();
       await sendCorreos(usuarios, eventosDia, semanal);
       return res.status(200).send({ message: "Eventos de hoxe enviados" });
@@ -251,6 +269,8 @@ const sendEventosDiarios = async (req, res, next) => {
   }
 };
 
+// Genera un shortURL de 4 caracteres garantizando unicidad en BD.
+// El bucle reintenta en caso de colisión (estadísticamente muy improbable con nanoid).
 async function generateUniqueShortUrl() {
   let unique = false;
   let shortUrl;
@@ -274,7 +294,7 @@ const getEventoById = async (req, res, next) => {
     if (idEvento.length === 4) {
       // Verifica si el parámetro es un shortURL
       evento = await Evento.findOne({ shortURL: idEvento }).populate(
-        "location"
+        "location",
       );
     } else {
       // Si no, asume que es un evento_id
@@ -304,11 +324,15 @@ const setEvento = async (req, res, next) => {
       newEvento.image = req.file.path;
     }
     if (newEvento.festival) {
+      // Fire-and-forget: no se espera para no bloquear la respuesta al cliente.
+      // Un fallo aquí no debe impedir la creación del evento.
       addEventoToFestival(newEvento.festival, newEvento._id);
     }
     await newEvento.save();
 
-    return res.status(200).json({ message: "Evento creado con éxito", evento: newEvento });
+    return res
+      .status(200)
+      .json({ message: "Evento creado con éxito", evento: newEvento });
   } catch (error) {
     error.message = "Erro ao crear evento";
     return next(error);
@@ -354,7 +378,7 @@ const deleteEvento = async (req, res, next) => {
 const updateEvento = async (req, res, next) => {
   try {
     const { idEvento } = req.params;
-    let eventoToUpdate = await Evento.findById(idEvento);
+    const eventoToUpdate = await Evento.findById(idEvento);
     if (!eventoToUpdate) {
       return res.status(404).json({ message: "Evento no encontrado" });
     }
@@ -365,15 +389,19 @@ const updateEvento = async (req, res, next) => {
       req.body.image = req.file.path;
     }
 
-    eventoToUpdate = new Evento(req.body);
-
-    eventoToUpdate._id = idEvento;
+    if (req.body.location === "") {
+      req.body.location = undefined;
+    }
 
     const updatedEvento = await Evento.findByIdAndUpdate(
       idEvento,
-      eventoToUpdate,
-      { new: true }
+      { $set: req.body },
+      { new: true, runValidators: true },
     );
+    // If the event has been added to a festival, update the festival's events list
+    if (updatedEvento.festival) {
+      await addEventoToFestival(updatedEvento.festival, updatedEvento._id);
+    }
 
     return res.status(200).json(updatedEvento);
   } catch (error) {
@@ -386,13 +414,15 @@ const sendEmailsCorreccion = async (usuarios, evento, mensaje, asunto) => {
     await new Promise((resolve) => setTimeout(resolve, 500)); // Esperar 500 ms entre cada envío
   }
 };
+// Envía un correo de corrección/aviso sobre un evento a todos los usuarios
+// suscritos a nuevos eventos O a la newsletter (unión de ambas preferencias).
 const sendCorreccion = async (req, res, next) => {
   try {
     const { mensaje, asunto, eventoId } = req.body;
     const evento = await Evento.findById(eventoId, "_id title").lean();
     const usuariosANotificar = await User.find(
       { $or: [{ newevent: true }, { newsletter: true }] },
-      "email username"
+      "email username",
     ).lean();
 
     await sendEmailsCorreccion(usuariosANotificar, evento, mensaje, asunto);
@@ -402,6 +432,9 @@ const sendCorreccion = async (req, res, next) => {
   }
 };
 
+// Script de migración puntual: rellena el campo `location` (ObjectId) en eventos
+// que solo tienen el campo de texto libre `site`, buscando coincidencia por nombre
+// de localización (insensible a mayúsculas y acentos).
 const updateSiteField = async (req, res, next) => {
   try {
     // 1. Obtener todas las localizaciones y crear el array A con name e id
@@ -425,9 +458,11 @@ const updateSiteField = async (req, res, next) => {
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "")
             .toLowerCase();
+        // Se toma solo la parte antes de la primera coma del campo site
+        // (p.ej. "Sala Apolo, Barcelona" → "sala apolo") para la comparación
         const sitePart = normalize(evento.site.split(",")[0].trim());
         const locMatch = arrayConNameId.find((loc) =>
-          sitePart.includes(normalize(loc.name))
+          sitePart.includes(normalize(loc.name)),
         );
         if (locMatch) {
           // 4. Asignar location
