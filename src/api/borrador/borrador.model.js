@@ -21,6 +21,7 @@ const borradorSchema = new mongoose.Schema(
     highlighted: { type: Boolean, default: false },
     shortURL: { type: String },
     timestamp: { type: Date, default: Date.now },
+    festival: { type: mongoose.Schema.Types.ObjectId, ref: "festival" },
   },
   { timestamps: true, collection: "borrador" }
 );
