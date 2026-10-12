@@ -92,13 +92,19 @@ const createFestival = async (req, res, next) => {
 };
 
 const addEventoToFestival = async (festivalId, eventoId) => {
-  try {
-    const festival = await Festival.findById(festivalId);
+ try {
+  //usando addToSet evitamos que se añadan eventos que ya existen en un mismo festival
+    const festival = await Festival.findByIdAndUpdate(
+      festivalId,
+      { $addToSet: { eventos: eventoId } },
+      { new: true }
+    );
+
     if (!festival) {
       throw new Error("Festival not found");
     }
-    festival.eventos.push(eventoId);
-    await festival.save();
+
+    return festival;
   } catch (error) {
     console.error("Error adding evento to festival:", error);
     throw error;

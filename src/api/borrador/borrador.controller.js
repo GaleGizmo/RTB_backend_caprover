@@ -82,7 +82,7 @@ const updateBorrador = async (req, res, next) => {
 };
 const deleteBorrador = async (req, res, next) => {
   try {
-    const borrador = await Borrador.findByIdAndDelete(req.params.id);
+    const borrador = await Borrador.findByIdAndDelete(req.params.idBorrador);
     if (!borrador) {
       return res.status(404).json({ message: "Borrador non atopado" });
     }
