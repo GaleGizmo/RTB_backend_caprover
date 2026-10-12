@@ -6,7 +6,7 @@ const createTransporter = async () => {
   const oAuth2Client = new google.auth.OAuth2(
     process.env.CLIENT_ID,
     process.env.CLIENT_SECRET,
-    "https://developers.google.com/oauthplayground"
+    "https://developers.google.com/oauthplayground",
   );
 
   oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
@@ -52,7 +52,6 @@ const enviarCorreoEventos = async (destinatario, eventos, semanal) => {
 
       const nombreMes = mesesEnGallego[mes];
       const lugar = evento.site;
-        
 
       eventosHTML += `
        <div style="font-family: Arial, sans-serif; margin: 10px auto ; width:70%;  border: 2px solid #000; border-radius: 10px; padding: 10px 20px; background-image:linear-gradient(to bottom, #f16704, #fff);  ">
@@ -102,7 +101,7 @@ const enviarCorreoEventos = async (destinatario, eventos, semanal) => {
     console.error(
       "Error al enviar el correo electrónico a:",
       destinatario.email,
-      error.response
+      error.response,
     );
     throw new Error("No se pudo enviar el correo electrónico.");
   }
@@ -188,7 +187,7 @@ const enviarMensajeDeUsuario = async (
   asunto,
   nombreDeUsuario,
   emailDeUsuario = "N/A",
-  mensaje
+  mensaje,
 ) => {
   try {
     const transporter = await createTransporter();
@@ -213,10 +212,39 @@ const enviarMensajeDeUsuario = async (
     throw new Error("No se pudo enviar el correo electrónico.");
   }
 };
+
+const notificarNuevoEvento = async (evento) => {
+  try {
+    const transporter = await createTransporter();
+
+    const contenido = `
+     <div style="display: block; width: 100%; text-align:center;">
+      <p>Ola, xefe!</p>
+     <p>Gloria engadiu un novo evento:</p>
+     <p></p>
+     <p>Evento: ${evento.title}</p>
+     <p>Artista: ${evento.artist} </p>
+     <p>Lugar: ${evento.site}  </p>
+ 
+      </div>`;
+    const subject = `Novo evento engadido`;
+    const email = {
+      from: " Rock The Barrio <rockthebarrio@gmail.com>",
+      to: "miguelaf71@hotmail.com",
+      subject: subject,
+      html: contenido,
+    };
+    const respuesta = await transporter.sendMail(email);
+  } catch (error) {
+    console.error("Error al enviar el correo electrónico:", error);
+    throw new Error("No se pudo enviar el correo electrónico.");
+  }
+};
 module.exports = {
   enviarCorreoEventos,
   enviarCorreoRecuperacion,
   enviarReminderEventos,
   enviarCorreccionEvento,
   enviarMensajeDeUsuario,
+  notificarNuevoEvento,
 };

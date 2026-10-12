@@ -4,6 +4,7 @@ const {
   enviarCorreoEventos,
   enviarCorreccionEvento,
   enviarReminderEventos,
+  notificarNuevoEvento,
 } = require("../../utils/email");
 
 const { DateTime } = require("luxon");
@@ -329,6 +330,8 @@ const setEvento = async (req, res, next) => {
       addEventoToFestival(newEvento.festival, newEvento._id);
     }
     await newEvento.save();
+    if (newEvento.user_creator.toString() !== "647e21d461cb4c9819bcea4e")
+      await notificarNuevoEvento(newEvento);
 
     return res
       .status(200)
